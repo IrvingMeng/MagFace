@@ -1,16 +1,14 @@
 #!/usr/bin/env python
-
 import sys
 sys.path.append("..")
-
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import os
-from termcolor import cprint
-from tqdm import tqdm
-from collections import OrderedDict
 from models import iresnet
+from collections import OrderedDict
+from tqdm import tqdm
+from termcolor import cprint
+import os
+import torch.nn.functional as F
+import torch.nn as nn
+import torch
 
 
 def load_features(args):
@@ -28,12 +26,12 @@ def load_features(args):
         features = iresnet.iresnet50(
             pretrained=False,
             num_classes=args.embedding_size,
-        )   
+        )
     elif args.arch == 'iresnet100':
         features = iresnet.iresnet100(
             pretrained=False,
             num_classes=args.embedding_size,
-        )          
+        )
     else:
         raise ValueError()
     return features
@@ -80,9 +78,10 @@ def clean_dict_inf(model, state_dict):
            v.size() == model.state_dict()[new_kk].size():
             _state_dict[new_kk] = v
     num_model = len(model.state_dict().keys())
-    num_ckpt = len(_state_dict.keys())            
+    num_ckpt = len(_state_dict.keys())
     if num_model != num_ckpt:
-        sys.exit("=> Not all weights loaded, model params: {}, loaded params: {}".format(num_model, num_ckpt))
+        sys.exit("=> Not all weights loaded, model params: {}, loaded params: {}".format(
+            num_model, num_ckpt))
     return _state_dict
 
 
@@ -91,4 +90,3 @@ def builder_inf(args):
     # Used to run inference
     model = load_dict_inf(args, model)
     return model
-

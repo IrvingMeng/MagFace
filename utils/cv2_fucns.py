@@ -50,10 +50,12 @@ def to_tensor(pic):
         Tensor: Converted image.
     """
     if not(_is_pil_image(pic) or _is_numpy(pic)):
-        raise TypeError('pic should be PIL Image or ndarray. Got {}'.format(type(pic)))
+        raise TypeError(
+            'pic should be PIL Image or ndarray. Got {}'.format(type(pic)))
 
     if _is_numpy(pic) and not _is_numpy_image(pic):
-        raise ValueError('pic should be 2/3 dimensional. Got {} dimensions.'.format(pic.ndim))
+        raise ValueError(
+            'pic should be 2/3 dimensional. Got {} dimensions.'.format(pic.ndim))
 
     if isinstance(pic, np.ndarray):
         # handle numpy array
@@ -68,7 +70,8 @@ def to_tensor(pic):
             return img
 
     if accimage is not None and isinstance(pic, accimage.Image):
-        nppic = np.zeros([pic.channels, pic.height, pic.width], dtype=np.float32)
+        nppic = np.zeros(
+            [pic.channels, pic.height, pic.width], dtype=np.float32)
         pic.copyto(nppic)
         return torch.from_numpy(nppic)
 
@@ -99,6 +102,7 @@ def to_tensor(pic):
     else:
         return img
 
+
 def normalize(tensor, mean, std, inplace=False):
     """Normalize a tensor image with mean and standard deviation.
     .. note::
@@ -124,9 +128,11 @@ def normalize(tensor, mean, std, inplace=False):
     tensor.sub_(mean[:, None, None]).div_(std[:, None, None])
     return tensor
 
+
 def crop(img, i, j, h, w):
     if not _is_numpy_image(img):
-        raise TypeError('img should be OpenCV numpy Image. Got {}'.format(type(img)))
+        raise TypeError(
+            'img should be OpenCV numpy Image. Got {}'.format(type(img)))
     return img[i:i+h, j:j+w, :]
 
 
@@ -139,15 +145,18 @@ def center_crop(img, output_size):
     j = int(round((w - tw) / 2.))
     return img[i:i+th, j:j+tw, :]
 
+
 def resized_crop(img, i, j, h, w, size, interpolation=cv2.INTER_LINEAR):
     assert _is_numpy_image(img), 'img should be OpenCV numpy Image'
     img = crop(img, i, j, h, w)
     img = resize(img, size, interpolation)
     return img
 
+
 def resize(img, size, interpolation=cv2.INTER_LINEAR):
     if not _is_numpy_image(img):
-        raise TypeError('img should be OpenCV numpy Image. Got {}'.format(type(img)))
+        raise TypeError(
+            'img should be OpenCV numpy Image. Got {}'.format(type(img)))
     if not (isinstance(size, int) or (isinstance(size, Iterable) and len(size) == 2)):
         raise TypeError('Got inappropriate size arg: {}'.format(size))
 
@@ -166,10 +175,12 @@ def resize(img, size, interpolation=cv2.INTER_LINEAR):
     else:
         return cv2.resize(img, size[::-1], interpolation)
 
+
 def hflip(img):
     if not _is_numpy_image(img):
-        raise TypeError('img should be OpenCV numpy Image. Got {}'.format(type(img)))
-    if img.shape[2]==1:
-        return cv2.flip(img,1)[:, :, np.newaxis]
+        raise TypeError(
+            'img should be OpenCV numpy Image. Got {}'.format(type(img)))
+    if img.shape[2] == 1:
+        return cv2.flip(img, 1)[:, :, np.newaxis]
     else:
         return cv2.flip(img, 1)

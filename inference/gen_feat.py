@@ -1,40 +1,37 @@
 #!/usr/bin/env python
-
 import sys
 sys.path.append("..")
 
-import os
-import pprint
-import time
-import warnings
-import numpy as np
-import argparse
-
-import torch
-import torchvision
-import torch.utils.data.distributed
-import torch.distributed as dist
-import torch.multiprocessing as mp
-import torch.nn.functional as F
-import torch.utils.data as data
-
-from torchvision import transforms
-from torchvision import datasets
-from termcolor import cprint
-import cv2
-from network_inf import builder_inf
 from utils import utils
+from network_inf import builder_inf
+import cv2
+from termcolor import cprint
+from torchvision import datasets
+from torchvision import transforms
+import torch.utils.data as data
+import torch.nn.functional as F
+import torch.multiprocessing as mp
+import torch.distributed as dist
+import torch.utils.data.distributed
+import torchvision
+import torch
+import argparse
+import numpy as np
+import warnings
+import time
+import pprint
+import os
 
 # parse the args
 cprint('=> parse the args ...', 'green')
 parser = argparse.ArgumentParser(description='Trainer for posenet')
-parser.add_argument('--arch', default='iresnet100', type=str, 
+parser.add_argument('--arch', default='iresnet100', type=str,
                     help='backbone architechture')
-parser.add_argument('--inf_list', default='', type=str, 
+parser.add_argument('--inf_list', default='', type=str,
                     help='the inference list')
 parser.add_argument('--feat_list', type=str,
                     help='The save path for saveing features')
-parser.add_argument('-j', '--workers', default=4, type=int, metavar='N', 
+parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('-b', '--batch_size', default=256, type=int, metavar='N',
                     help='mini-batch size (default: 256), this is the total '
@@ -85,7 +82,7 @@ def main(args):
     cprint('=> ngpus : {}'.format(ngpus_per_node), 'green')
     main_worker(ngpus_per_node, args)
 
-    
+
 def main_worker(ngpus_per_node, args):
     cprint('=> modeling the network ...', 'green')
     model = builder_inf(args)
@@ -99,8 +96,8 @@ def main_worker(ngpus_per_node, args):
             std=[1., 1., 1.]),
     ])
     inf_dataset = ImgInfLoader(
-        ann_file = args.inf_list,
-        transform = trans
+        ann_file=args.inf_list,
+        transform=trans
     )
 
     inf_loader = torch.utils.data.DataLoader(
@@ -117,9 +114,9 @@ def main_worker(ngpus_per_node, args):
     data_time = utils.AverageMeter('Data', ':6.3f')
 
     progress = utils.ProgressMeter(
-                    len(inf_loader),
-                    [batch_time, data_time],
-                    prefix="Extract Features: ")
+        len(inf_loader),
+        [batch_time, data_time],
+        prefix="Extract Features: ")
 
     # switch to evaluate mode
     model.eval()
@@ -134,7 +131,7 @@ def main_worker(ngpus_per_node, args):
 
             # compute output
             embedding_feat = model(input[0])
-            
+
             # embedding_feat = F.normalize(embedding_feat, p=2, dim=1)
             _feat = embedding_feat.data.cpu().numpy()
 
@@ -154,9 +151,9 @@ def main_worker(ngpus_per_node, args):
     # close
     fio.close()
 
+
 if __name__ == '__main__':
     # parse the args
     cprint('=> parse the args ...', 'green')
     pprint.pprint(vars(args))
     main(args)
-

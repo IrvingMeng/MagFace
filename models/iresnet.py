@@ -23,9 +23,11 @@ class IBasicBlock(nn.Module):
                  base_width=64, dilation=1):
         super(IBasicBlock, self).__init__()
         if groups != 1 or base_width != 64:
-            raise ValueError('BasicBlock only supports groups=1 and base_width=64')
+            raise ValueError(
+                'BasicBlock only supports groups=1 and base_width=64')
         if dilation > 1:
-            raise NotImplementedError("Dilation > 1 not supported in BasicBlock")
+            raise NotImplementedError(
+                "Dilation > 1 not supported in BasicBlock")
         # Both self.conv1 and self.downsample layers downsample the input when stride != 1
         self.bn1 = nn.BatchNorm2d(inplanes, eps=2e-05, momentum=0.9)
         self.conv1 = conv3x3(inplanes, planes)
@@ -85,14 +87,16 @@ class IResNet(nn.Module):
                                        dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
 
-        self.bn2 = nn.BatchNorm2d(512 * block.expansion, eps=2e-05, momentum=0.9)
+        self.bn2 = nn.BatchNorm2d(
+            512 * block.expansion, eps=2e-05, momentum=0.9)
         self.dropout = nn.Dropout2d(p=0.4, inplace=True)
         self.fc = nn.Linear(512 * block.expansion * self.fc_scale, num_classes)
         self.features = nn.BatchNorm1d(num_classes, eps=2e-05, momentum=0.9)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                nn.init.kaiming_normal_(
+                    m.weight, mode='fan_out', nonlinearity='relu')
             elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
@@ -111,7 +115,8 @@ class IResNet(nn.Module):
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.Sequential(
                 conv1x1(self.inplanes, planes * block.expansion, stride),
-                nn.BatchNorm2d(planes * block.expansion, eps=2e-05, momentum=0.9),
+                nn.BatchNorm2d(planes * block.expansion,
+                               eps=2e-05, momentum=0.9),
             )
 
         layers = []
@@ -129,10 +134,10 @@ class IResNet(nn.Module):
         x = self.bn1(x)
         x = self.prelu(x)
 
-        x = self.layer1(x)     
-        x = self.layer2(x)     
-        x = self.layer3(x)     
-        x = self.layer4(x)     
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
 
         x = self.bn2(x)
         x = self.dropout(x)
@@ -146,15 +151,16 @@ class IResNet(nn.Module):
 def _iresnet(arch, block, layers, pretrained, progress, **kwargs):
     model = IResNet(block, layers, **kwargs)
     # if pretrained:
-        # state_dict = load_state_dict_from_url(model_urls[arch],
-        #                                        progress=progress)
-        # model.load_state_dict(state_dict)
+    # state_dict = load_state_dict_from_url(model_urls[arch],
+    #                                        progress=progress)
+    # model.load_state_dict(state_dict)
     return model
 
 
 def iresnet18(pretrained=False, progress=True, **kwargs):
     return _iresnet('iresnet18', IBasicBlock, [2, 2, 2, 2], pretrained, progress,
                     **kwargs)
+
 
 def iresnet34(pretrained=False, progress=True, **kwargs):
     return _iresnet('iresnet34', IBasicBlock, [3, 4, 6, 3], pretrained, progress,

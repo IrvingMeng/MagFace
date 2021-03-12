@@ -23,6 +23,7 @@ __all__ = ["Compose", "ToTensor", "Normalize", "Lambda",
            "RandomContrastion", "RandomPrimary"
            "MotionBlur", "MedianBlur", "RandomOcclusion"]
 
+
 class Compose(object):
     """Composes several transforms together.
     Args:
@@ -69,6 +70,7 @@ class ToTensor(object):
     def __repr__(self):
         return self.__class__.__name__ + '()'
 
+
 class Normalize(object):
     """Normalize a tensor image with mean and standard deviation.
     Given mean: ``(M1,...,Mn)`` and std: ``(S1,..,Sn)`` for ``n`` channels, this transform
@@ -111,7 +113,8 @@ class Resize(object):
     """
 
     def __init__(self, size, interpolation=cv2.INTER_LINEAR):
-        assert isinstance(size, int) or (isinstance(size, collections.Iterable) and len(size) == 2)
+        assert isinstance(size, int) or (isinstance(
+            size, collections.Iterable) and len(size) == 2)
         self.size = size
         self.interpolation = interpolation
 
@@ -137,7 +140,8 @@ class ResizeShort(object):
     """
 
     def __init__(self, size, interpolation=cv2.INTER_LINEAR):
-        assert isinstance(size, int) or (isinstance(size, collections.Iterable) and len(size) == 2)
+        assert isinstance(size, int) or (isinstance(
+            size, collections.Iterable) and len(size) == 2)
         self.size = size
         self.interpolation = interpolation
 
@@ -156,6 +160,7 @@ class ResizeShort(object):
 
     def __repr__(self):
         return self.__class__.__name__ + '(size={0}, interpolation={1})'.format(self.size, self.interpolation)
+
 
 class CenterCrop(object):
     """Crops the given numpy ndarray at the center.
@@ -242,10 +247,12 @@ class RandomCrop(object):
 
         # pad the width if needed
         if self.pad_if_needed and img.shape[1] < self.size[1]:
-            img = F.pad(img, (self.size[1] - img.shape[1], 0), self.fill, self.padding_mode)
+            img = F.pad(
+                img, (self.size[1] - img.shape[1], 0), self.fill, self.padding_mode)
         # pad the height if needed
         if self.pad_if_needed and img.shape[0] < self.size[0]:
-            img = F.pad(img, (0, self.size[0] - img.shape[0]), self.fill, self.padding_mode)
+            img = F.pad(
+                img, (0, self.size[0] - img.shape[0]), self.fill, self.padding_mode)
 
         i, j, h, w = self.get_params(img, self.size)
 
@@ -347,8 +354,10 @@ class RandomResizedCrop(object):
     def __repr__(self):
         interpolate_str = _pil_interpolation_to_str[self.interpolation]
         format_string = self.__class__.__name__ + '(size={0}'.format(self.size)
-        format_string += ', scale={0}'.format(tuple(round(s, 4) for s in self.scale))
-        format_string += ', ratio={0}'.format(tuple(round(r, 4) for r in self.ratio))
+        format_string += ', scale={0}'.format(tuple(round(s, 4)
+                                                    for s in self.scale))
+        format_string += ', ratio={0}'.format(tuple(round(r, 4)
+                                                    for r in self.ratio))
         format_string += ', interpolation={0})'.format(interpolate_str)
         return format_string
 
@@ -370,6 +379,7 @@ class RandomBrightness(object):
             hue_factor is chosen uniformly from [-hue, hue] or the given [min, max].
             Should have 0<= hue <= 0.5 or -0.5 <= min <= max <= 0.5.
     """
+
     def __init__(self, p=0):
         self.p = p
 
@@ -380,16 +390,16 @@ class RandomBrightness(object):
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         factor = np.random.uniform()
         factor = 1-p + 2*p*factor
-        hsv[:,:,2] = np.clip(factor*hsv[:,:,2], 0, 255).astype(np.uint8)
+        hsv[:, :, 2] = np.clip(factor*hsv[:, :, 2], 0, 255).astype(np.uint8)
         img = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
         return img
 
     def __call__(self, img):
-         img = self.get_param(img, self.p)
-         return img
+        img = self.get_param(img, self.p)
+        return img
 #            transforms.append(Lambda(lambda img: F.adjust_brightness(img, brightness_factor)))
 
-            #transforms.append(Lambda(lambda img: do_random_brightness(img, brightness_factor)))
+        #transforms.append(Lambda(lambda img: do_random_brightness(img, brightness_factor)))
 
 #        if contrast is not None:
 #            contrast_factor = random.uniform(contrast[0], contrast[1])
@@ -407,13 +417,14 @@ class RandomBrightness(object):
 #        random.shuffle(transforms)
 #        transform = Compose(transforms)
 
-
     def __repr__(self):
         return self.__class__.__name__ + '(p={})'.format(self.p)
+
 
 class RandomSaturation(object):
     """Randomly change the saturation of an image.
     """
+
     def __init__(self, saturation=0):
         self.saturation = saturation
 
@@ -425,7 +436,7 @@ class RandomSaturation(object):
         alpha = 1-saturation + 2*saturation*saturation_factor
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         # saturation should always be within [0,1.0]
-        hsv[:,:,1] = np.clip(alpha * hsv[:,:,1], 0, 255)
+        hsv[:, :, 1] = np.clip(alpha * hsv[:, :, 1], 0, 255)
 
         return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
@@ -440,6 +451,7 @@ class RandomSaturation(object):
 class RandomContrastion(object):
     """Randomly change the contrast of an image.
     """
+
     def __init__(self, contrastion=0):
         self.contrastion = contrastion
 
@@ -450,7 +462,7 @@ class RandomContrastion(object):
 
         alpha = contrastion - 2*contrastion*np.random.uniform()
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        grey = (3.0 * alpha / hsv[:,:,2].size) * np.sum(hsv[:,:,2])
+        grey = (3.0 * alpha / hsv[:, :, 2].size) * np.sum(hsv[:, :, 2])
         img = alpha * img + grey
         img = np.clip(img, 0, 255)
         return img
@@ -466,6 +478,7 @@ class RandomContrastion(object):
 class RandomPrimary(object):
     """Randomly change the primary of an image.
     """
+
     def __init__(self, primary=0):
         self.primary = primary
 
@@ -476,8 +489,9 @@ class RandomPrimary(object):
 
         up_shape = img.shape
         resize_factor = np.random.randint(1, primary) * 2
-        img = cv2.resize(img, (int(img.shape[0] / resize_factor), int(img.shape[1] / resize_factor)), cv2.INTER_AREA)
-        img = cv2.resize(img, (up_shape[0], up_shape[1]),cv2.INTER_AREA)
+        img = cv2.resize(img, (int(
+            img.shape[0] / resize_factor), int(img.shape[1] / resize_factor)), cv2.INTER_AREA)
+        img = cv2.resize(img, (up_shape[0], up_shape[1]), cv2.INTER_AREA)
         return img
 
     def __call__(self, img):
@@ -491,6 +505,7 @@ class RandomPrimary(object):
 class MotionBlur(object):
     """Randomly change the Motion Blur of an image.
     """
+
     def __init__(self, motion=0):
         self.motion = motion
 
@@ -499,7 +514,7 @@ class MotionBlur(object):
         if np.random.rand() > 0.5:
             return img
         kernel_size = random.randint(1, motion)
-        direction = random.randint(0,3)
+        direction = random.randint(0, 3)
         if direction == 0:
             # vertical
             kernel = np.zeros((kernel_size, kernel_size))
@@ -526,22 +541,27 @@ class MotionBlur(object):
 class GaussianBlur(object):
     def __init__(self, kernel_size=0):
         self.kernel_size = kernel_size
+
     @staticmethod
     def get_params(img, kernel_size):
         if np.random.rand() > 0.5:
             return img
         kernel = random.randint(1, kernel_size)
-        img = cv2.GaussianBlur(img,(2*kernel+1, 2*kernel+1),0)
+        img = cv2.GaussianBlur(img, (2*kernel+1, 2*kernel+1), 0)
         return img
+
     def __call__(self, img):
         transform = self.get_params(img, self.kernel_size)
         return img
+
     def __repr__(self):
         return self.__class__.__name__ + '(kernel_size={0})'.format(self.kernel_size)
+
 
 class MedianBlur(object):
     def __init__(self, kernel_size=0):
         self.kernel_size = kernel_size
+
     @staticmethod
     def get_params(img, kernel_size):
         kernel = random.randint(1, kernel_size)
@@ -549,19 +569,23 @@ class MedianBlur(object):
         if case > 0.5:
             return img
         elif case < 0.25:
-            img = cv2.medianBlur(img,2*kernel+1)
+            img = cv2.medianBlur(img, 2*kernel+1)
         else:
-            img = cv2.GaussianBlur(img,(2*kernel+1, 2*kernel+1),0)
+            img = cv2.GaussianBlur(img, (2*kernel+1, 2*kernel+1), 0)
         return img
+
     def __call__(self, img):
         transform = self.get_params(img, self.kernel_size)
         return img
+
     def __repr__(self):
         return self.__class__.__name__ + '(kernel_size={0})'.format(self.kernel_size)
+
 
 class RandomOcclusion(object):
     def __init__(self, ratio=0):
         self.ratio = ratio
+
     @staticmethod
     def get_params(img, ratio):
         if np.random.rand() > 0.5:
@@ -570,16 +594,20 @@ class RandomOcclusion(object):
         y = random.randint(int(shape[0]*0.1), shape[0])
         x = random.randint(int(shape[0]*0.1), shape[1])
         if y < shape[0] * ratio:
-            img[0:y,:,:] = np.clip([y, shape[1], 3], 0, 0).astype(np.uint8)
+            img[0:y, :, :] = np.clip([y, shape[1], 3], 0, 0).astype(np.uint8)
         elif y > shape[0] * (1-ratio):
-            img[y:shape[0]-1,:,:] = np.clip([y, shape[1], 3], 0, 0).astype(np.uint8)
+            img[y:shape[0]-1, :,
+                :] = np.clip([y, shape[1], 3], 0, 0).astype(np.uint8)
         elif x < shape[1] * ratio:
-            img[:,0:x,:] = np.clip([shape[0], x, 3], 0, 0).astype(np.uint8)
+            img[:, 0:x, :] = np.clip([shape[0], x, 3], 0, 0).astype(np.uint8)
         elif x > shape[1] * (1 - ratio):
-            img[:,x:shape[0]-1,:] = np.clip([shape[0], x, 3], 0, 0).astype(np.uint8)
+            img[:, x:shape[0]-1,
+                :] = np.clip([shape[0], x, 3], 0, 0).astype(np.uint8)
         return img
+
     def __call__(self, img):
         transform = self.get_params(img, self.ratio)
         return img
+
     def __repr__(self):
         return self.__class__.__name__ + '(ratio={0})'.format(self.ratio)
