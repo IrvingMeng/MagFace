@@ -6,7 +6,6 @@ Authors are from [AiBee](https://www.aibee.cn/).
 
 ![margin penalty for target logit](raw/magface.png)
 
-
 **Paper**: [arXiv](https://arxiv.org/abs/2103.06627)
 
 **A toy example**: [examples.ipynb](inference/examples.ipynb)
@@ -17,11 +16,9 @@ Authors are from [AiBee](https://www.aibee.cn/).
 
 **CheckPoint**: GoogleDrive (TBD), [BaiduDrive](https://pan.baidu.com/s/15iKz3wv6UhKmPGR6ltK4AA) code: wsw3
 
-
 **NOTE**: The original codes are implemented on [AiBee](https://www.aibee.cn/)'s codebase and will not be released. 
 See todo list for plans.
 **This repo is an official but abridged version.**
-
 
 ## BibTex
 
@@ -34,16 +31,24 @@ See todo list for plans.
 }
 ```
 
+## Usage
+1. Prepare a training list with format `imgname 0 id 0` in each line, as indicated [here](dataloader/dataloader.py#L31-L32).
+2. Modify parameters run/run.sh and run it!
+```
+cd run/
+./run.sh
+```
+
 ## Logs
 TODO list:
 
-    - [x] add toy examples and release models
-    - [x] migrate basic codes from AiBee's codebase
-    - [ ] Test the basic codes
-    - [ ] migrate parallel training 
-    - [ ] add evaluation codes for recognition
-    - [ ] add evaluation codes for quality assessment
-    - [ ] add f
+- [x] add toy examples and release models
+- [ ] migrate basic codes from AiBee's codebase
+- [ ] Test the basic codes
+- [ ] migrate parallel training 
+- [ ] add evaluation codes for recognition
+- [ ] add evaluation codes for quality assessment
+- [ ] add fp16
 
 **20210312** add the basic code (not tested yet).
 
