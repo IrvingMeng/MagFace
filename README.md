@@ -40,7 +40,7 @@ cd run/
 TODO list:
 
 - [x] add toy examples and release models
-- [x] migrate basic codes from AiBee's codebase 
+- [x] migrate basic codes from the private codebase 
 - [ ] add presentation (after the ddl for iccv2021)
 - [ ] test the basic codes 
 - [ ] extend the idea to CosFace
