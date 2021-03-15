@@ -17,8 +17,7 @@ Authors are from [AiBee](https://www.aibee.cn/).
 **CheckPoint**: [GoogleDrive](https://drive.google.com/file/d/1Bd87admxOZvbIOAyTkGEntsEz3fyMt7H/view?usp=sharing), [BaiduDrive](https://pan.baidu.com/s/15iKz3wv6UhKmPGR6ltK4AA) code: wsw3
 
 **NOTE**: The original codes are implemented on [AiBee](https://www.aibee.cn/)'s codebase and will not be released. 
-See todo list for plans.
-**This repo is an official but abridged version.**
+**This repo is an official but abridged version.** See todo list for plans.
 
 ## BibTex
 
@@ -51,6 +50,8 @@ TODO list:
 - [ ] add evaluation codes for recognition
 - [ ] add evaluation codes for quality assessment
 - [ ] add fp16
+
+**20210315** fix figure 2 and add gdrive link for checkpoint.
 
 **20210312** add the basic code (not tested yet).
 
