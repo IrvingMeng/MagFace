@@ -4,9 +4,9 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 
 Authors are from [AiBee](https://www.aibee.cn/).
 
-![margin penalty for target logit](raw/magface.png)
+![magface](raw/magface.png)
 
-**Paper**: [arXiv](https://arxiv.org/abs/2103.06627)
+**Paper**: [arXiv](https://arxiv.org/abs/2103.06627) (**NOTE**: Figure 2 in the arxiv version is incorrect and will be fixed later. Use the above one instead.)
 
 **A toy example**: [examples.ipynb](inference/examples.ipynb)
 
@@ -14,7 +14,7 @@ Authors are from [AiBee](https://www.aibee.cn/).
 
 **Presentation**: TBD
 
-**CheckPoint**: GoogleDrive (TBD), [BaiduDrive](https://pan.baidu.com/s/15iKz3wv6UhKmPGR6ltK4AA) code: wsw3
+**CheckPoint**: [GoogleDrive](https://drive.google.com/file/d/1Bd87admxOZvbIOAyTkGEntsEz3fyMt7H/view?usp=sharing), [BaiduDrive](https://pan.baidu.com/s/15iKz3wv6UhKmPGR6ltK4AA) code: wsw3
 
 **NOTE**: The original codes are implemented on [AiBee](https://www.aibee.cn/)'s codebase and will not be released. 
 See todo list for plans.
@@ -26,14 +26,14 @@ See todo list for plans.
 @inproceedings{meng2021magface,
   title={MagFace: A universal representation for face recognition and quality assessment},
   author={Meng, Qiang and Zhao, Shichao and Huang, Zhida and Zhou, Feng},
-  booktitle=IEEE Conference on Computer Vision and Pattern Recognition (CVPR),
+  booktitle=IEEE Conference on Computer Vision and Pattern Recognition,
   year=2021
 }
 ```
 
 ## Usage
 1. Prepare a training list with format `imgname 0 id 0` in each line, as indicated [here](dataloader/dataloader.py#L31-L32).
-2. Modify parameters run/run.sh and run it!
+2. Modify parameters in run/run.sh and run it!
 ```
 cd run/
 ./run.sh
@@ -43,8 +43,10 @@ cd run/
 TODO list:
 
 - [x] add toy examples and release models
-- [ ] migrate basic codes from AiBee's codebase
-- [ ] Test the basic codes
+- [x] migrate basic codes from AiBee's codebase 
+- [ ] add presentation (after the ddl for iccv2021)
+- [ ] test the basic codes 
+- [ ] extend the idea to CosFace
 - [ ] migrate parallel training 
 - [ ] add evaluation codes for recognition
 - [ ] add evaluation codes for quality assessment
