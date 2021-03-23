@@ -1,6 +1,6 @@
 # MagFace
 MagFace: A Universal Representation for Face Recognition and Quality Assessment  
-in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **Oral** presentation
+in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **Oral** presentation.
 
 ![magface](raw/magface.png)
 
@@ -14,7 +14,7 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 
 **Presentation**: TBD
 
-**CheckPoint**: [GoogleDrive](https://drive.google.com/file/d/1Bd87admxOZvbIOAyTkGEntsEz3fyMt7H/view?usp=sharing), [BaiduDrive](https://pan.baidu.com/s/15iKz3wv6UhKmPGR6ltK4AA) code: wsw3
+**Pretrained Model**: (trained on MS1MV2) [GoogleDrive](https://drive.google.com/file/d/1Bd87admxOZvbIOAyTkGEntsEz3fyMt7H/view?usp=sharing), [BaiduDrive](https://pan.baidu.com/s/15iKz3wv6UhKmPGR6ltK4AA) code: wsw3
 
 **NOTE**: The original codes are implemented on a private codebase and will not be released. 
 **This repo is an official but abridged version.** See todo list for plans.
@@ -39,6 +39,18 @@ cd run/
 ./run.sh
 ```
 
+## Parallel Training
+**Note:** codes are mainly based on Aibee's mpu (author: [Kaiyu Yue](http://kaiyuyue.com/ ) and will be released in middle of April.
+
+Parallel training (Sec. 5.1 in [ArcFace](https://arxiv.org/pdf/1801.07698v3.pdf)) can highly speed up training as well as reduce consumption of GPU memory. Here are some results.
+
+| Parallel Method | Float Type | Backbone | GPU | Batch Size | FC Size | Split FC? | Avg. Throughput (images/sec) | Memory (MiB) | 
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| DP | FP32 | iResNet50 | v100 x 8 | 512 |  85742 | No | 1099.41 | 8681 |
+| DDP | FP32 | iResNet50 | v100 x 8 | 512 |  85742 | **Yes** | 1668.74 | 8473 |
+| DP | FP32 | iResNet100 | v100 x 8 | 512 |  85742 | No | 612.40 | 11825 |
+| DDP | FP32 | iResNet100 | v100 x 8 | 512 |  85742 | **Yes** | 1060.16 | 10823 |
+
 ## Logs
 TODO list:
 
@@ -53,7 +65,7 @@ TODO list:
 - [ ] add evaluation codes for quality assessment
 - [ ] add fp16
 
-**20210323** add requirements and beamer presentation
+**20210323** add requirements and beamer presentation; add debug logs; 
 
 **20210315** fix figure 2 and add gdrive link for checkpoint.
 

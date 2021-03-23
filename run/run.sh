@@ -6,16 +6,16 @@ la=10
 ua=110
 lm=0.45
 um=0.8
-lg=20
+lg=35
 
 # settings
-MODEL_ARC=iresnet100
+MODEL_ARC=iresnet50
 OUTPUT=./test/
 
 mkdir -p ${OUTPUT}/vis/
 
 python -u trainer.py \
-    --arch iresnet50 \
+    --arch ${MODEL_ARC} \
     --train_list /training/face-group/opensource/ms1m-112/ms1m_train.list \
     --workers 8 \
     --epochs 25 \
@@ -37,4 +37,4 @@ python -u trainer.py \
     --l_margin ${lm} \
     --u_margin ${um} \
     --lambda_g ${lg} \
-    --vis_mag 1       
+    --vis_mag 1    2>&1 | tee ${OUTPUT}/output.log   

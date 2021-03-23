@@ -166,10 +166,12 @@ def do_train(train_loader, model, criterion, optimizer, epoch, args):
     top1 = utils.AverageMeter('Acc@1', ':6.2f')
     top5 = utils.AverageMeter('Acc@5', ':6.2f')
     learning_rate = utils.AverageMeter('LR', ':.4f')
+    throughputs = utils.AverageMeter('ThroughPut', ':.2f')
 
     losses_id = utils.AverageMeter('L_ID', ':.3f')
     losses_mag = utils.AverageMeter('L_mag', ':.6f')
-    progress_template = [batch_time, data_time, losses, losses_id, losses_mag,
+    progress_template = [batch_time, data_time, throughputs, 'images/s',
+                         losses, losses_id, losses_mag, 
                          top1, top5, learning_rate]
 
     progress = utils.ProgressMeter(
@@ -212,11 +214,16 @@ def do_train(train_loader, model, criterion, optimizer, epoch, args):
         optimizer.step()
 
         # measure elapsed time
-        batch_time.update(time.time() - end)
+        duration = time.time() - end
+        batch_time.update(duration)
         end = time.time()
+        throughputs.update(args.batch_size / duration)
 
         if i % args.print_freq == 0:
             progress.display(i)
+            debug_info(x_norm, args.l_a, args.u_a,
+                           args.l_margin, args.u_margin)
+
         if args.vis_mag:
             if (i > 10000) and (i % 100 == 0):
                 x_norm = x_norm.detach().cpu().numpy()
@@ -226,6 +233,23 @@ def do_train(train_loader, model, criterion, optimizer, epoch, args):
                     F.softmax(output[0]), one_hot.bool()).detach().cpu().numpy()
                 np.savez('{}/vis/epoch_{}_iter{}'.format(args.pth_save_fold, epoch, i),
                          x_norm, logit, cos_theta)
+
+
+def debug_info(x_norm, l_a, u_a, l_margin, u_margin):
+    """
+    visualize the magnitudes and magins during training.
+    Note: modify the function if m(a) is not linear
+    """
+    mean_ = torch.mean(x_norm).detach().cpu().numpy()
+    max_ = torch.max(x_norm).detach().cpu().numpy()
+    min_ = torch.min(x_norm).detach().cpu().numpy()
+    m_mean_ = (u_margin-l_margin)/(u_a-l_a)*(mean_-l_a) + l_margin
+    m_max_ = (u_margin-l_margin)/(u_a-l_a)*(max_-l_a) + l_margin
+    m_min_ = (u_margin-l_margin)/(u_a-l_a)*(min_-l_a) + l_margin
+    print('  [debug info]: x_norm mean: {:.2f} min: {:.2f} max: {:.2f}'
+          .format(mean_, min_, max_))
+    print('  [debug info]: margin mean: {:.2f} min: {:.2f} max: {:.2f}'
+          .format(m_mean_, m_min_, m_max_))
 
 
 if __name__ == '__main__':
