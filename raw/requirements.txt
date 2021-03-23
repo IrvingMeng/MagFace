@@ -1,0 +1,15 @@
+torchvision
+torch
+numpy
+scipy
+termcolor
+opencv-contrib-python
+jupyterlab
+notebook
+seaborn
+Pillow==6.2.2
+matplotlib 
+loguru
+six
+imageio
+scikit-image
