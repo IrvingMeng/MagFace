@@ -39,20 +39,17 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 1. install [requirements](raw/requirements.txt).
 2. Prepare a training list with format `imgname 0 id 0` in each line, as indicated [here](dataloader/dataloader.py#L31-L32).
 3. Modify parameters in run/run.sh and run it!
-```
-cd run/
-./run.sh
-```
 
 ## Parallel Training
-**Note:** Use **Pytorch > 1.7** for this feature. Codes are mainly based on Aibee's mpu (author: [Kaiyu Yue](http://kaiyuyue.com/)) and will be released in middle of April.
+**Note:** Use **Pytorch > 1.7** for this feature. Codes are mainly based on Aibee's mpu (author: [Kaiyu Yue](http://kaiyuyue.com/), will be released in middle of April).
 
 How to run: 
 
 1. Update NCCL info (can be found with the command `ifconfig`) and port info in [train_dist.py](run/train_dist.py#L290-292)
-2. Set the number of gpus in [here](run/train_dist.py#L283). (If training with multi-machines, modify [node number](run/train_dist.py#L284).)
-2. Enble fp16 training by setiing `--fp16 1` in run/run_dist.sh.
-3. run run/run_dist.sh.
+2. Set the number of gpus in [here](run/train_dist.py#L283). 
+3. If training with multi-machines, modify [node number](run/train_dist.py#L284) (not tested yet).
+4. Enble fp16 training by setiing `--fp16 1` in run/run_dist.sh.
+5. run run/run_dist.sh.
 
 
 Parallel training (Sec. 5.1 in [ArcFace](https://arxiv.org/pdf/1801.07698v3.pdf)) can highly speed up training as well as reduce consumption of GPU memory. Here are some results.
@@ -75,7 +72,7 @@ TODO list:
 - [x] test the basic codes 
 - [ ] add presentation
 - [x] migrate parallel training 
-- [ ] release mpu ([Kaiyu Yue](http://kaiyuyue.com/), in April)
+- [ ] release mpu (Kaiyu Yue, in April)
 - [ ] test parallel training 
 - [ ] add evaluation codes for recognition
 - [ ] add evaluation codes for quality assessment
