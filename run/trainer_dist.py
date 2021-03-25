@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 import sys
 sys.path.append("..")
-from dataloader import dataloader
-from models import magface
+from dataloader import dataloader_dist
+from models import magface_dist
+
 from utils import utils
+from utils import mpu
+from torch.cuda.amp import autocast
+from torch.cuda.amp import GradScaler
 import numpy as np
 from collections import OrderedDict
 from termcolor import cprint
@@ -11,6 +15,7 @@ from torchvision import datasets
 from torchvision import transforms
 import torch.backends.cudnn as cudnn
 import torch.multiprocessing as mp
+import torch.nn.parallel as parallel
 import torch.nn.functional as F
 import torch.nn as nn
 import torchvision
@@ -21,8 +26,6 @@ import warnings
 import time
 import pprint
 import os
-
-
 warnings.filterwarnings("ignore")
 
 
@@ -69,6 +72,8 @@ parser.add_argument('--pth-save-fold', default='tmp', type=str,
                     help='The folder to save pths')
 parser.add_argument('--pth-save-epoch', default=1, type=int,
                     help='The epoch to save pth')
+parser.add_argument('--fp16', default=0, type=int,
+                    help='whether use fp16')                    
 
 
 # magface parameters
@@ -106,12 +111,18 @@ def main(args):
     main_worker(ngpus_per_node, args)
 
 
-def main_worker(ngpus_per_node, args):
-    global best_acc1
+def main_worker(gpu, args):
+    args.gpu = gpu
+    args.rank = args.nr * args.gpus + args.gpu
+    torch.cuda.set_device(gpu)
+    torch.distributed.init_process_group(backend='nccl', init_method='env://', world_size=args.world_size, rank=args.rank)
+    torch.manual_seed(0)
 
+    mpu.initialize_model_parallel(args.world_size)  # init mpu
+
+    global best_acc1
     cprint('=> modeling the network ...', 'green')
-    model = magface.builder(args)
-    model = torch.nn.DataParallel(model).cuda()
+    model = magface_dist.builder(args)
     # for name, param in model.named_parameters():
     #     cprint(' : layer name and parameter size - {} - {}'.format(name, param.size()), 'green')
 
@@ -122,12 +133,13 @@ def main_worker(ngpus_per_node, args):
         momentum=args.momentum,
         weight_decay=args.weight_decay)
     pprint.pprint(optimizer)
+    grad_scaler = GradScaler(enabled=args.amp_mode)
 
     cprint('=> building the dataloader ...', 'green')
-    train_loader = dataloader.train_loader(args)
+    train_loader = dataloader_dist.train_loader(args)
 
     cprint('=> building the criterion ...', 'green')
-    criterion = magface.MagLoss(
+    criterion = mpu.ParallelMagLoss(
         args.l_a, args.u_a, args.l_margin, args.u_margin)
 
     global iters
@@ -135,12 +147,11 @@ def main_worker(ngpus_per_node, args):
 
     cprint('=> starting training engine ...', 'green')
     for epoch in range(args.start_epoch, args.epochs):
-
         global current_lr
         current_lr = utils.adjust_learning_rate(optimizer, epoch, args)
 
         # train for one epoch
-        do_train(train_loader, model, criterion, optimizer, epoch, args)
+        do_train(train_loader, model, criterion, optimizer, grad_scaler, epoch, args)
 
         # save pth
         if epoch % args.pth_save_epoch == 0:
@@ -153,18 +164,18 @@ def main_worker(ngpus_per_node, args):
                 'optimizer': optimizer.state_dict(),
             }, False,
                 filename=os.path.join(
-                args.pth_save_fold, '{}.pth'.format(
-                    str(epoch+1).zfill(5))
+                args.pth_save_fold, '{}_rank{}.pth'.format(
+                    str(epoch+1).zfill(5),
+                    str(mpu.get_model_parallel_rank()).zfill(5))
             ))
             cprint(' : save pth for epoch {}'.format(epoch + 1))
 
 
-def do_train(train_loader, model, criterion, optimizer, epoch, args):
+def do_train(train_loader, model, criterion, optimizer, grad_scaler, epoch, args):
     batch_time = utils.AverageMeter('Time', ':6.3f')
     data_time = utils.AverageMeter('Data', ':6.3f')
     losses = utils.AverageMeter('Loss', ':.3f')
     top1 = utils.AverageMeter('Acc@1', ':6.2f')
-    top5 = utils.AverageMeter('Acc@5', ':6.2f')
     learning_rate = utils.AverageMeter('LR', ':.4f')
     throughputs = utils.AverageMeter('ThroughPut', ':.2f')
 
@@ -172,7 +183,7 @@ def do_train(train_loader, model, criterion, optimizer, epoch, args):
     losses_mag = utils.AverageMeter('L_mag', ':.6f')
     progress_template = [batch_time, data_time, throughputs, 'images/s',
                          losses, losses_id, losses_mag, 
-                         top1, top5, learning_rate]
+                         top1, learning_rate]
 
     progress = utils.ProgressMeter(
         len(train_loader),
@@ -193,46 +204,62 @@ def do_train(train_loader, model, criterion, optimizer, epoch, args):
         target = target.cuda(non_blocking=True)
 
         # compute output
-        output, x_norm = model(input, target)
+        with autocast(enabled=args.amp_mode):
+            output, x_norm = model(input, target)
+        
+        # x_norm is not needed to be gathered, as feature x is in each rank
+        target = mpu._gather(target, dim=0)
 
-        loss_id, loss_g, one_hot = criterion(output, target, x_norm)
+        # loss
+        with autocast(enabled=args.amp_mode):
+            loss_id, loss_g, one_hot = criterion(output, 
+                                                 target,
+                                                 x_norm)
         loss = loss_id + args.lambda_g * loss_g
+        # compute gradient and do solver step
+        optimizer.zero_grad()
+
+        # backward
+        grad_scaler.scale(loss).backward()
+        # update weights
+        grad_scaler.step(optimizer)
+        grad_scaler.update() 
+
+        # syn for logging
+        torch.cuda.synchronize()   
+
+        # measure elapsed time
+        if args.rank == 0:
+            duration = time.time() - end
+            end = time.time()
+            batch_time.update(duration)
+            bs = args.batch_size
+            throughputs.update(args.world_size * bs / duration)
 
         # measure accuracy and record loss
-        acc1, acc5 = utils.accuracy(args, output[0], target, topk=(1, 5))
+        acc1, _ = mpu.accuracy(args, output, target, topk=(1, 1))
 
         losses.update(loss.item(), input.size(0))
         top1.update(acc1[0], input.size(0))
-        top5.update(acc5[0], input.size(0))
 
         losses_id.update(loss_id.item(), input.size(0))
         losses_mag.update(args.lambda_g*loss_g.item(), input.size(0))
 
-        # compute gradient and do solver step
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        # measure elapsed time
-        duration = time.time() - end
-        batch_time.update(duration)
-        end = time.time()
-        throughputs.update(args.batch_size / duration)
-
-        if i % args.print_freq == 0:
+        if i % args.print_freq == 0 and args.rank == 0:
             progress.display(i)
             debug_info(x_norm, args.l_a, args.u_a,
                            args.l_margin, args.u_margin)
 
         if args.vis_mag:
-            if (i > 10000) and (i % 100 == 0):
-                x_norm = x_norm.detach().cpu().numpy()
-                cos_theta = torch.masked_select(
-                    output[0], one_hot.bool()).detach().cpu().numpy()
-                logit = torch.masked_select(
-                    F.softmax(output[0]), one_hot.bool()).detach().cpu().numpy()
-                np.savez('{}/vis/epoch_{}_iter{}'.format(args.pth_save_fold, epoch, i),
-                         x_norm, logit, cos_theta)
+            if (epoch == args.epochs-1) and (i % 1000 == 0):
+                one_hot = one_hot.bool()
+                mask = torch.sum(one_hot, dim=1).bool()
+                x_norm_cur_rank = torch.masked_select(
+                    x_norm.squeeze(), mask).detach().cpu().numpy()
+                cos_theta_cur_rank = torch.masked_select(
+                    output[0], one_hot).detach().cpu().numpy()
+                np.savez('{}/vis/epoch_{}_iter{}_rank_{}'.format(args.pth_save_fold, epoch, i, args.rank),
+                         x_norm_cur_rank, cos_theta_cur_rank)
 
 
 def debug_info(x_norm, l_a, u_a, l_margin, u_margin):
@@ -253,6 +280,22 @@ def debug_info(x_norm, l_a, u_a, l_margin, u_margin):
 
 
 if __name__ == '__main__':
-
+    args.gpus = 8
+    args.nodes = 1
+    args.nr = 0
+    args.parallel_module_name = 'parallel_fc'
+    args.amp_mode = True if args.fp16 else False    
+    
+    args.world_size = args.gpus * args.nodes                
+    os.environ['MASTER_ADDR'] = '172.20.10.63'              
+    os.environ['NCCL_SOCKET_IFNAME'] = 'enp97s0f0' 
+    os.environ['MASTER_PORT'] = '12355'                     
+    
     pprint.pprint(vars(args))
-    main(args)
+    if args.batch_size % args.world_size is not 0:
+        print('batch size {} is not a multiplier of world size {}'.format(
+            args.batch_size, args.world_size
+        ))
+        exit(1)
+    args.batch_size = int(args.batch_size / args.world_size)
+    mp.spawn(main_worker, nprocs=args.gpus, args=(args,))    
