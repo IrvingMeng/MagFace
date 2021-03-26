@@ -35,6 +35,14 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 | DDP | fp32 | iResNet100 | MS1MV2 | yes | [GoogleDrive](https://drive.google.com/file/d/1Bd87admxOZvbIOAyTkGEntsEz3fyMt7H/view?usp=sharing), [BaiduDrive](https://pan.baidu.com/s/15iKz3wv6UhKmPGR6ltK4AA) code: wsw3 |
 | DP | fp32 | iResNet50 | MS1MV2 | No | [BaiduDrive](https://pan.baidu.com/s/1atuZZDkcCX3Bl14J8Ss_YQ) code: tvyv | [BaiduDrive](https://pan.baidu.com/s/1T6_TkEh9v9Vtf4Sw-chT2w), code: hpbt |
 
+## Evaluation
+### Quality Assessment
+Steps to calculate face qualities ([examples.ipynb](inference/examples.ipynb) is a toy example).
+
+1. Extract features from faces with `inference/gen_feat.py`. 
+2. Calculate feature magnitudes with `np.linalg.norm()`. 
+
+
 ## Basic Training
 1. install [requirements](raw/requirements.txt).
 2. Prepare a training list with format `imgname 0 id 0` in each line, as indicated [here](dataloader/dataloader.py#L31-L32).
@@ -80,9 +88,9 @@ TODO list:
 - [ ] test fp16
 - [ ] extend the idea to CosFace
 
-**20210325.2** Add codes for parallel training as well as fp16 training (not tested).
+**20210325.2** add codes for parallel training as well as fp16 training (not tested).
 
-**20210325** The basic training codes are tested! Please find the trained model and logs from the table in Model Zoo.
+**20210325** the basic training codes are tested! Please find the trained model and logs from the table in Model Zoo.
 
 **20210323** add requirements and beamer presentation; add debug logs.
 
