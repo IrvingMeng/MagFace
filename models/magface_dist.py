@@ -73,7 +73,7 @@ class MagFaceBuilder(nn.Module):
                     scale=args.arc_scale,
                     local_rank_init=False,
                 )
-            )
+        )
 
     def build_parallel_module(self, module_name, module):
         setattr(self, module_name, module)

@@ -95,7 +95,7 @@ parser.add_argument('--vis_mag', default=1, type=int,
 args = parser.parse_args()
 
 
-def main(args):
+def main_worker(gpu, args):
     # check the feasible of the lambda g
     s = 64
     k = (args.u_margin-args.l_margin)/(args.u_a-args.l_a)
@@ -108,10 +108,6 @@ def main(args):
     ngpus_per_node = torch.cuda.device_count()
     cprint('=> ngpus : {}'.format(ngpus_per_node), 'green')
 
-    main_worker(ngpus_per_node, args)
-
-
-def main_worker(gpu, args):
     args.gpu = gpu
     args.rank = args.nr * args.gpus + args.gpu
     torch.cuda.set_device(gpu)
@@ -121,12 +117,14 @@ def main_worker(gpu, args):
     mpu.initialize_model_parallel(args.world_size)  # init mpu
 
     global best_acc1
-    cprint('=> modeling the network ...', 'green')
+    if args.rank == 0:
+        cprint('=> modeling the network ...', 'green')
     model = magface_dist.builder(args)
     # for name, param in model.named_parameters():
     #     cprint(' : layer name and parameter size - {} - {}'.format(name, param.size()), 'green')
 
-    cprint('=> building the oprimizer ...', 'green')
+    if args.rank == 0:
+        cprint('=> building the oprimizer ...', 'green')
     optimizer = torch.optim.SGD(
         filter(lambda p: p.requires_grad, model.parameters()),
         args.lr,
@@ -135,17 +133,18 @@ def main_worker(gpu, args):
     pprint.pprint(optimizer)
     grad_scaler = GradScaler(enabled=args.amp_mode)
 
-    cprint('=> building the dataloader ...', 'green')
+    if args.rank == 0:
+        cprint('=> building the dataloader ...', 'green')
     train_loader = dataloader_dist.train_loader(args)
-
-    cprint('=> building the criterion ...', 'green')
+    if args.rank == 0:
+        cprint('=> building the criterion ...', 'green')
     criterion = mpu.ParallelMagLoss(
         args.l_a, args.u_a, args.l_margin, args.u_margin)
 
     global iters
     iters = 0
-
-    cprint('=> starting training engine ...', 'green')
+    if args.rank == 0:
+        cprint('=> starting training engine ...', 'green')
     for epoch in range(args.start_epoch, args.epochs):
         global current_lr
         current_lr = utils.adjust_learning_rate(optimizer, epoch, args)
@@ -164,9 +163,9 @@ def main_worker(gpu, args):
                 'optimizer': optimizer.state_dict(),
             }, False,
                 filename=os.path.join(
-                args.pth_save_fold, '{}_rank{}.pth'.format(
+                args.pth_save_fold, '{}_rank_{}.pth'.format(
                     str(epoch+1).zfill(5),
-                    str(mpu.get_model_parallel_rank()).zfill(5))
+                    str(mpu.get_model_parallel_rank()).zfill(2))
             ))
             cprint(' : save pth for epoch {}'.format(epoch + 1))
 
@@ -215,7 +214,7 @@ def do_train(train_loader, model, criterion, optimizer, grad_scaler, epoch, args
             loss_id, loss_g, one_hot = criterion(output, 
                                                  target,
                                                  x_norm)
-        loss = loss_id + args.lambda_g * loss_g
+        loss = loss_id + args.lambda_g * loss_g * args.world_size
         # compute gradient and do solver step
         optimizer.zero_grad()
 
