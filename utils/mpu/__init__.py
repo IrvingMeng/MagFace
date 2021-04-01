@@ -40,6 +40,4 @@ from .mappings import _split
 from .random import model_parallel_cuda_manual_seed
 
 from .ext_layers import ParallelMagLinear
-from .ext_layers import ParallelCosMarginLinear
 from .ext_losses import ParallelMagLoss
-from .ext_losses import ParallelCosMarginLoss

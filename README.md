@@ -46,8 +46,10 @@ Steps to calculate face qualities ([examples.ipynb](inference/examples.ipynb) is
 
 ## Basic Training
 1. install [requirements](raw/requirements.txt).
-2. Prepare a training list with format `imgname 0 id 0` in each line, as indicated [here](dataloader/dataloader.py#L31-L32).
+2. Prepare a training list with format `imgname 0 id 0` in each line, as indicated [here](dataloader/dataloader.py#L31-L32). In the paper, we employ MS1MV2 as the training dataset which can be downloaded from [BaiduDrive](https://pan.baidu.com/s/1S6LJZGdqcZRle1vlcMzHOQ) or [Dropbox](https://www.dropbox.com/s/wpx6tqjf0y5mf6r/faces_ms1m-refine-v2_112x112.zip?dl=0).
+Use [`rec2image.py`](https://github.com/deepinsight/insightface/blob/master/recognition/common/rec2image.py) to extract images.
 3. Modify parameters in run/run.sh and run it!
+
 
 ## Parallel Training
 **Note:** Use **Pytorch > 1.7** for this feature. Codes are mainly based on Aibee's mpu (author: [Kaiyu Yue](http://kaiyuyue.com/), will be released in middle of April).
