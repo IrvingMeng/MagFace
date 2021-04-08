@@ -74,6 +74,10 @@ Parallel training (Sec. 5.1 in [ArcFace](https://arxiv.org/pdf/1801.07698v3.pdf)
 | DDP | FP32 | iResNet100 | v100 x 8 | 512 |  85742 | **Yes** | 1060.16 | 10777 |
 | DDP | FP16 | iResNet100 | v100 x 8 | 512 |  85742 | **Yes** | 2013.90 | 7319 |
 
+## Third-party Re-implementation
+
+- Pytorch: [FaceX-Zoo](https://github.com/JDAI-CV/FaceX-Zoo/tree/main/training_mode) from JD-AI.
+
 ## Logs
 TODO list:
 
