@@ -76,7 +76,7 @@ Parallel training (Sec. 5.1 in [ArcFace](https://arxiv.org/pdf/1801.07698v3.pdf)
 
 ## Third-party Re-implementation
 
-- Pytorch: [FaceX-Zoo](https://github.com/JDAI-CV/FaceX-Zoo/tree/main/training_mode) from JD-AI.
+- Pytorch: [FaceX-Zoo](https://github.com/JDAI-CV/FaceX-Zoo/tree/main/training_mode) from JDAI.
 
 ## Logs
 TODO list:
