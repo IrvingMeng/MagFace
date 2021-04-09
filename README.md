@@ -58,8 +58,8 @@ How to run:
 
 1. Update NCCL info (can be found with the command `ifconfig`) and port info in [train_dist.py](run/train_dist.py#L290-292)
 2. Set the number of gpus in [here](run/train_dist.py#L283). 
-3. If training with multi-machines, modify [node number](run/train_dist.py#L284) (not tested yet).
-4. Enble fp16 training by setiing `--fp16 1` in run/run_dist.sh.
+3. [Optional. Not tested yet!] If training with multi-machines, modify [node number](run/train_dist.py#L284).
+4. [Optional. Not tested yet!] Enable fp16 training by setiing `--fp16 1` in run/run_dist.sh.
 5. run run/run_dist.sh.
 
 
