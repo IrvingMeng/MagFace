@@ -43,6 +43,7 @@ parser.add_argument('--resume', default=None, type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('-p', '--print-freq', default=100, type=int,
                     metavar='N', help='print frequency (default: 10)')
+parser.add_argument('--cpu-mode', action='store_true', help='Use the CPU.')
 args = parser.parse_args()
 
 
@@ -86,7 +87,9 @@ def main(args):
 def main_worker(ngpus_per_node, args):
     cprint('=> modeling the network ...', 'green')
     model = builder_inf(args)
-    model = torch.nn.DataParallel(model).cuda()
+    model = torch.nn.DataParallel(model)
+    if not args.cpu_mode:
+        model = model.cuda()
 
     cprint('=> building the dataloader ...', 'green')
     trans = transforms.Compose([

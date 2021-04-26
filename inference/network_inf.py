@@ -51,7 +51,10 @@ class NetworkBuilder_inf(nn.Module):
 def load_dict_inf(args, model):
     if os.path.isfile(args.resume):
         cprint('=> loading pth from {} ...'.format(args.resume))
-        checkpoint = torch.load(args.resume)
+        if args.cpu_mode:
+            checkpoint = torch.load(args.resume, map_location=torch.device("cpu"))
+        else:
+            checkpoint = torch.load(args.resume)
         _state_dict = clean_dict_inf(model, checkpoint['state_dict'])
         model_dict = model.state_dict()
         model_dict.update(_state_dict)
