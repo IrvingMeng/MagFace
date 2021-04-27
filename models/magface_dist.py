@@ -12,8 +12,8 @@ import math
 import torch
 import torch.nn as nn
 import os
-from utils import mpu
 import torch.nn.parallel as parallel
+import torchshard as ts
 
 
 def builder(args):
@@ -56,7 +56,7 @@ class MagFaceBuilder(nn.Module):
         self.l_margin = args.l_margin
         self.u_margin = args.u_margin
         self.l_a = args.l_a
-        self.u_a = args.u_a        
+        self.u_a = args.u_a
 
         self.parallel_module_name = args.parallel_module_name
         self.fc_parallel_type = None
@@ -64,10 +64,10 @@ class MagFaceBuilder(nn.Module):
             self.parallel_module_name,
             None
         )
-
+        from .parallel_maglinear import ParallelMagLinear
         self.build_parallel_module(
                 self.parallel_module_name,
-                mpu.ParallelMagLinear(
+                ParallelMagLinear(
                     args.embedding_size,
                     args.last_fc_size,
                     scale=args.arc_scale,
@@ -89,9 +89,9 @@ class MagFaceBuilder(nn.Module):
         x = self.features(x)
         x_norm = torch.norm(x, dim=1, keepdim=True).clamp(self.l_a, self.u_a)
 
-        x = mpu.gather_from_region(x, dim=0)
-        x_norm = mpu.gather_from_region(x_norm, dim=0)
-        logits = getattr(self, self.parallel_module_name)(x, 
-                                                          x_norm, 
+        x = ts.distributed.gather(x, dim=0)
+        x_norm = ts.distributed.gather(x_norm, dim=0)
+        logits = getattr(self, self.parallel_module_name)(x,
+                                                          x_norm,
                                                           self._margin)
         return logits, x_norm

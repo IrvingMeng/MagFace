@@ -7,15 +7,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.distributed as dist
 
-from .initialize import get_model_parallel_world_size
-from .initialize import get_model_parallel_rank
-from .initialize import get_model_parallel_group
-from .mappings import copy_to_region
-from .mappings import scatter_to_region
-from .mappings import gather_from_region
-from .utils import divide
-from .utils import Utility
 from loguru import logger
+
+import torchshard as ts
+
 
 class ParallelMagLinear(torch.nn.Module):
     """
@@ -33,56 +28,32 @@ class ParallelMagLinear(torch.nn.Module):
         self.out_features = out_features
         self.scale = scale
 
-        # divide
-        self.world_size = get_model_parallel_world_size()
-        self.out_features_per_partition = divide(
-            self.out_features,
-            self.world_size
-        )
-
         # weight
-        self.weight = torch.nn.Parameter(torch.Tensor(
-            self.out_features_per_partition,
+        self.weight = torch.Tensor(
+            self.out_features,
             self.inp_features
-        ))
+        ).to(ts.distributed.get_rank())
 
         # info
         self.easy_margin = easy_margin
 
-        # init
-        if local_rank_init:
-            logger.warning('parallel weight initialization method: LOCAL rank')
-            self.reset_local_rank_parameters()
-        else:
-            logger.warning('parallel weight initialization method: GLOBAL processes')
-            self.reset_parameters()
-
-    def reset_local_rank_parameters(self):
-        self.weight.data.uniform_(-1, 1).renorm_(2,1,1e-5).mul_(1e5)
-        self.weight.model_parallel = True
-
     def reset_parameters(self):
-        # init weight
-        _weight = torch.empty(
-            self.out_features,
-            self.inp_features,
-            dtype=self.weight.dtype,
-            requires_grad=False
-        )
-        _weight.data.uniform_(-1, 1).renorm_(2,1,1e-5).mul_(1e5)
+        self.weight.data.uniform_(-1, 1).renorm_(2,1,1e-5).mul_(1e5)
 
-        # scatter
-        self.weight.data = scatter_to_region(_weight, dim=0)
-        self.weight.model_parallel = True
+    def slice_params(self):
+        self.weight = ts.distributed.scatter(self.weight, dim=0)
+        # wrap into Parameter
+        self.weight = Parameter(self.weight)
 
-        # del weight
-        del _weight
+        # set parallel attr
+        ts.register_parallel_dim(self.weight, -1)
+
 
     def forward(self, x, x_norm, m):
         """
         Here m is a function which generate adaptive margin
         """
-        x = copy_to_region(x.float())
+        x = ts.distributed.copy(x.float())
 
         ada_margin = m(x_norm)
         cos_m = torch.cos(ada_margin)
@@ -117,6 +88,10 @@ class ParallelMagLinear(torch.nn.Module):
         # multiply the scale in advance
         cos_theta_m = self.scale * cos_theta_m
         cos_theta = self.scale * cos_theta
+
+        # set parallel attribute
+        ts.register_parallel_dim(cos_theta_m, -1)
+        ts.register_parallel_dim(cos_theta, -1)
 
         return cos_theta, cos_theta_m
 

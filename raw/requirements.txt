@@ -1,4 +1,5 @@
 torchvision
+torchshard
 torch
 numpy
 scipy
