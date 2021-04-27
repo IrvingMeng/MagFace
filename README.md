@@ -21,9 +21,9 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 
 ```
 @inproceedings{meng2021magface,
-  title={MagFace: A universal representation for face recognition and quality assessment},
+  title={{MagFace}: A universal representation for face recognition and quality assessment},
   author={Meng, Qiang and Zhao, Shichao and Huang, Zhida and Zhou, Feng},
-  booktitle=IEEE Conference on Computer Vision and Pattern Recognition,
+  booktitle=CVPR,
   year=2021
 }
 ```
@@ -46,20 +46,21 @@ Steps to calculate face qualities ([examples.ipynb](inference/examples.ipynb) is
 
 ## Basic Training
 1. install [requirements](raw/requirements.txt).
-2. Prepare a training list with format `imgname 0 id 0` in each line, as indicated [here](dataloader/dataloader.py#L31-L32). In the paper, we employ MS1MV2 as the training dataset which can be downloaded from [BaiduDrive](https://pan.baidu.com/s/1S6LJZGdqcZRle1vlcMzHOQ) or [Dropbox](https://www.dropbox.com/s/wpx6tqjf0y5mf6r/faces_ms1m-refine-v2_112x112.zip?dl=0).
+2. Align images to 112x112 pixels with 5 facial landmarks ([code](https://github.com/deepinsight/insightface/blob/master/recognition/common/face_align.py)).
+3. Prepare a training list with format `imgname 0 id 0` in each line, as indicated [here](dataloader/dataloader.py#L31-L32). In the paper, we employ MS1MV2 as the training dataset which can be downloaded from [BaiduDrive](https://pan.baidu.com/s/1S6LJZGdqcZRle1vlcMzHOQ) or [Dropbox](https://www.dropbox.com/s/wpx6tqjf0y5mf6r/faces_ms1m-refine-v2_112x112.zip?dl=0).
 Use [`rec2image.py`](https://github.com/deepinsight/insightface/blob/master/recognition/common/rec2image.py) to extract images.
-3. Modify parameters in run/run.sh and run it!
+4. Modify parameters in run/run.sh and run it!
 
 
 ## Parallel Training
-**Note:** Use **Pytorch > 1.7** for this feature. Codes are mainly based on Aibee's mpu (author: [Kaiyu Yue](http://kaiyuyue.com/), will be released in middle of April).
+**Note:** Use **Pytorch > 1.7** for this feature. Codes are mainly based on [torchshard](https://github.com/KaiyuYue/torchshard) from [Kaiyu Yue](http://kaiyuyue.com/).
 
 How to run: 
 
 1. Update NCCL info (can be found with the command `ifconfig`) and port info in [train_dist.py](run/train_dist.py#L290-292)
 2. Set the number of gpus in [here](run/train_dist.py#L283). 
 3. [Optional. Not tested yet!] If training with multi-machines, modify [node number](run/train_dist.py#L284).
-4. [Optional. Not tested yet!] Enable fp16 training by setiing `--fp16 1` in run/run_dist.sh.
+4. [Optional. **Help needed** as NAN can be reached during training.] Enable fp16 training by setiing `--fp16 1` in run/run_dist.sh.
 5. run run/run_dist.sh.
 
 
@@ -77,6 +78,7 @@ Parallel training (Sec. 5.1 in [ArcFace](https://arxiv.org/pdf/1801.07698v3.pdf)
 ## Third-party Re-implementation
 
 - Pytorch: [FaceX-Zoo](https://github.com/JDAI-CV/FaceX-Zoo/tree/main/training_mode) from JDAI.
+- Pytorch: [pt-femb-face-embeddings](https://github.com/jonasgrebe/pt-femb-face-embeddings) from [Jonas Grebe](https://github.com/jonasgrebe)
 
 ## Logs
 TODO list:
@@ -87,13 +89,15 @@ TODO list:
 - [x] test the basic codes 
 - [ ] add presentation
 - [x] migrate parallel training 
-- [ ] release mpu (Kaiyu Yue, in April)
+- [x] release mpu (Kaiyu Yue, in April) **renamed to torchshard**
 - [x] test parallel training 
 - [ ] add evaluation codes for recognition
 - [ ] add evaluation codes for quality assessment
 - [x] add fp16
 - [ ] test fp16
 - [ ] extend the idea to CosFace
+
+**20210427**: [IMPORTANT] now parallel training is available (credits to Kaiyu Yue).
 
 **20210331** test fp32 + parallel training and release a model/log
 
