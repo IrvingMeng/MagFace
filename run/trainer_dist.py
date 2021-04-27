@@ -5,10 +5,10 @@ from dataloader import dataloader_dist
 from models import magface_dist
 
 from utils import utils
-from utils import mpu
 from torch.cuda.amp import autocast
 from torch.cuda.amp import GradScaler
 import numpy as np
+import torchshard as ts
 from collections import OrderedDict
 from termcolor import cprint
 from torchvision import datasets
@@ -113,8 +113,9 @@ def main_worker(gpu, args):
     torch.cuda.set_device(gpu)
     torch.distributed.init_process_group(backend='nccl', init_method='env://', world_size=args.world_size, rank=args.rank)
     torch.manual_seed(0)
-
-    mpu.initialize_model_parallel(args.world_size)  # init mpu
+    
+    # init torchshard
+    ts.distributed.init_process_group(group_size=args.world_size)
 
     global best_acc1
     if args.rank == 0:
@@ -138,7 +139,9 @@ def main_worker(gpu, args):
     train_loader = dataloader_dist.train_loader(args)
     if args.rank == 0:
         cprint('=> building the criterion ...', 'green')
-    criterion = mpu.ParallelMagLoss(
+
+    from models.parallel_magloss import ParallelMagLoss
+    criterion = ParallelMagLoss(
         args.l_a, args.u_a, args.l_margin, args.u_margin)
 
     global iters
@@ -152,21 +155,34 @@ def main_worker(gpu, args):
         # train for one epoch
         do_train(train_loader, model, criterion, optimizer, grad_scaler, epoch, args)
 
+        # ts.collect_state_dict() needs to see all the process groups
+        state_dict = model.state_dict()
+        state_dict = ts.collect_state_dict(model, state_dict)
+    
         # save pth
         if epoch % args.pth_save_epoch == 0:
             state_dict = model.state_dict()
-
             utils.save_checkpoint({
                 'epoch': epoch + 1,
                 'arch': args.arch,
                 'state_dict': state_dict,
                 'optimizer': optimizer.state_dict(),
-            }, False,
-                filename=os.path.join(
-                args.pth_save_fold, '{}_rank_{}.pth'.format(
-                    str(epoch+1).zfill(5),
-                    str(mpu.get_model_parallel_rank()).zfill(2))
-            ))
+             }, False,
+             filename=os.path.join(
+                args.pth_save_fold, '{}.pth'.format(str(epoch+1).zfill(5)))
+             )            
+ 
+            # utils.save_checkpoint({
+            #     'epoch': epoch + 1,
+            #     'arch': args.arch,
+            #     'state_dict': state_dict,
+            #     'optimizer': optimizer.state_dict(),
+            # }, False,
+            #     filename=os.path.join(
+            #     args.pth_save_fold, '{}_rank_{}.pth'.format(
+            #         str(epoch+1).zfill(5),
+            #         str(mpu.get_model_parallel_rank()).zfill(2))
+            # ))
             cprint(' : save pth for epoch {}'.format(epoch + 1))
 
 
@@ -207,7 +223,7 @@ def do_train(train_loader, model, criterion, optimizer, grad_scaler, epoch, args
             output, x_norm = model(input, target)
         
         # x_norm is not needed to be gathered, as feature x is in each rank
-        target = mpu._gather(target, dim=0)
+        target = ts.distributed.gather(target, dim=0)
 
         # loss
         with autocast(enabled=args.amp_mode):
@@ -236,7 +252,8 @@ def do_train(train_loader, model, criterion, optimizer, grad_scaler, epoch, args
             throughputs.update(args.world_size * bs / duration)
 
         # measure accuracy and record loss
-        acc1, _ = mpu.accuracy(args, output, target, topk=(1, 1))
+        output = ts.distributed.gather(output[0], dim=-1)
+        acc1, acc5 = accuracy(output, target, topk=(1, 5))
 
         losses.update(loss.item(), input.size(0))
         top1.update(acc1[0], input.size(0))
@@ -276,6 +293,22 @@ def debug_info(x_norm, l_a, u_a, l_margin, u_margin):
           .format(mean_, min_, max_))
     print('  [debug info]: margin mean: {:.2f} min: {:.2f} max: {:.2f}'
           .format(m_mean_, m_min_, m_max_))
+
+def accuracy(output, target, topk=(1,)):
+    """Computes the accuracy over the k top predictions for the specified values of k"""
+    with torch.no_grad():
+        maxk = max(topk)
+        batch_size = target.size(0)
+
+        _, pred = output.topk(maxk, 1, True, True)
+        pred = pred.t()
+        correct = pred.eq(target.view(1, -1).expand_as(pred))
+
+        res = []
+        for k in topk:
+            correct_k = correct[:k].reshape(-1).float().sum(0, keepdim=True)
+            res.append(correct_k.mul_(100.0 / batch_size))
+        return res
 
 
 if __name__ == '__main__':
