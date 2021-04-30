@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.distributed as dist
+from torch.nn.parameter import Parameter
 
 from loguru import logger
 
@@ -36,6 +37,8 @@ class ParallelMagLinear(torch.nn.Module):
 
         # info
         self.easy_margin = easy_margin
+        self.reset_parameters()
+        self.slice_params()
 
     def reset_parameters(self):
         self.weight.data.uniform_(-1, 1).renorm_(2,1,1e-5).mul_(1e5)

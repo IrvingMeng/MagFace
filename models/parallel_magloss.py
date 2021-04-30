@@ -46,4 +46,4 @@ class ParallelMagLoss(torch.nn.Module):
         ts.register_parallel_dim(output, parallel_dim)
 
         loss = ts.nn.functional.parallel_cross_entropy(output, target)
-        return loss.mean(), loss_g, one_hot #, valid_num
+        return loss, loss_g, one_hot #, valid_num

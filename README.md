@@ -33,8 +33,10 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 | Parallel Method | Float Type | Backbone | Dataset | Split FC? | Model | Log File |
 | --- | --- | --- | --- | --- | --- | --- |
 | DDP | fp32 | iResNet100 | MS1MV2 | Yes | [GoogleDrive](https://drive.google.com/file/d/1Bd87admxOZvbIOAyTkGEntsEz3fyMt7H/view?usp=sharing), [BaiduDrive](https://pan.baidu.com/s/15iKz3wv6UhKmPGR6ltK4AA) code: wsw3 | **Trained by original codes** |
+| DP | fp32 | iResNet18 | CASIA-WebFace | No | [BaiduDrive](https://pan.baidu.com/s/1N478xTfSow342WsP9LTRXA) code: fkja | [BaiduDrive](https://pan.baidu.com/s/1JETcNuPYXfDlQuqq2GHM5w), code: npdc |
 | DP | fp32 | iResNet50 | MS1MV2 | No | [BaiduDrive](https://pan.baidu.com/s/1atuZZDkcCX3Bl14J8Ss_YQ) code: tvyv | [BaiduDrive](https://pan.baidu.com/s/1T6_TkEh9v9Vtf4Sw-chT2w), code: hpbt |
 | DDP | fp32 | iResNet50 | MS1MV2 | Yes | [BaiduDrive](https://pan.baidu.com/s/19FjwUyuPCTzLhGm3fvyPlw) code: idkx| [BaiduDrive](https://pan.baidu.com/s/1MGAmhtOangqr8nHxIFmNvg), code: 66j1 |
+
 
 ## Evaluation
 ### Quality Assessment
@@ -96,6 +98,8 @@ TODO list:
 - [x] add fp16
 - [ ] test fp16
 - [ ] extend the idea to CosFace
+
+**20210430**: Fix bugs for parallel training.
 
 **20210427**: [IMPORTANT] now parallel training is available (credits to Kaiyu Yue).
 

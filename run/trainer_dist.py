@@ -30,7 +30,6 @@ warnings.filterwarnings("ignore")
 
 
 # parse the args
-cprint('=> parse the args ...', 'green')
 parser = argparse.ArgumentParser(description='Trainer for Magface')
 parser.add_argument('--arch', default='resnet100', type=str,
                     help='backbone architechture')
@@ -101,18 +100,19 @@ def main_worker(gpu, args):
     k = (args.u_margin-args.l_margin)/(args.u_a-args.l_a)
     min_lambda = s*k*args.u_a**2*args.l_a**2/(args.u_a**2-args.l_a**2)
     color_lambda = 'red' if args.lambda_g < min_lambda else 'green'
-    cprint('min lambda g is {}, currrent lambda is {}'.format(
-        min_lambda, args.lambda_g), color_lambda)
-
-    cprint('=> torch version : {}'.format(torch.__version__), 'green')
     ngpus_per_node = torch.cuda.device_count()
-    cprint('=> ngpus : {}'.format(ngpus_per_node), 'green')
-
+    
     args.gpu = gpu
     args.rank = args.nr * args.gpus + args.gpu
     torch.cuda.set_device(gpu)
     torch.distributed.init_process_group(backend='nccl', init_method='env://', world_size=args.world_size, rank=args.rank)
     torch.manual_seed(0)
+    # logs
+    if args.rank == 0:
+        cprint('min lambda g is {}, currrent lambda is {}'.format(
+        min_lambda, args.lambda_g), color_lambda)
+        cprint('=> torch version : {}'.format(torch.__version__), 'green')
+        cprint('=> ngpus : {}'.format(ngpus_per_node), 'green')
     
     # init torchshard
     ts.distributed.init_process_group(group_size=args.world_size)
@@ -131,15 +131,14 @@ def main_worker(gpu, args):
         args.lr,
         momentum=args.momentum,
         weight_decay=args.weight_decay)
-    pprint.pprint(optimizer)
-    grad_scaler = GradScaler(enabled=args.amp_mode)
-
+    
     if args.rank == 0:
+        pprint.pprint(optimizer)
         cprint('=> building the dataloader ...', 'green')
-    train_loader = dataloader_dist.train_loader(args)
-    if args.rank == 0:
         cprint('=> building the criterion ...', 'green')
 
+    grad_scaler = GradScaler(enabled=args.amp_mode)
+    train_loader = dataloader_dist.train_loader(args)
     from models.parallel_magloss import ParallelMagLoss
     criterion = ParallelMagLoss(
         args.l_a, args.u_a, args.l_margin, args.u_margin)
@@ -161,7 +160,6 @@ def main_worker(gpu, args):
     
         # save pth
         if epoch % args.pth_save_epoch == 0:
-            state_dict = model.state_dict()
             utils.save_checkpoint({
                 'epoch': epoch + 1,
                 'arch': args.arch,
@@ -171,18 +169,6 @@ def main_worker(gpu, args):
              filename=os.path.join(
                 args.pth_save_fold, '{}.pth'.format(str(epoch+1).zfill(5)))
              )            
- 
-            # utils.save_checkpoint({
-            #     'epoch': epoch + 1,
-            #     'arch': args.arch,
-            #     'state_dict': state_dict,
-            #     'optimizer': optimizer.state_dict(),
-            # }, False,
-            #     filename=os.path.join(
-            #     args.pth_save_fold, '{}_rank_{}.pth'.format(
-            #         str(epoch+1).zfill(5),
-            #         str(mpu.get_model_parallel_rank()).zfill(2))
-            # ))
             cprint(' : save pth for epoch {}'.format(epoch + 1))
 
 
@@ -230,7 +216,7 @@ def do_train(train_loader, model, criterion, optimizer, grad_scaler, epoch, args
             loss_id, loss_g, one_hot = criterion(output, 
                                                  target,
                                                  x_norm)
-        loss = loss_id + args.lambda_g * loss_g * args.world_size
+        loss = loss_id + args.lambda_g * loss_g
         # compute gradient and do solver step
         optimizer.zero_grad()
 
@@ -265,17 +251,6 @@ def do_train(train_loader, model, criterion, optimizer, grad_scaler, epoch, args
             progress.display(i)
             debug_info(x_norm, args.l_a, args.u_a,
                            args.l_margin, args.u_margin)
-
-        if args.vis_mag:
-            if (epoch == args.epochs-1) and (i % 1000 == 0):
-                one_hot = one_hot.bool()
-                mask = torch.sum(one_hot, dim=1).bool()
-                x_norm_cur_rank = torch.masked_select(
-                    x_norm.squeeze(), mask).detach().cpu().numpy()
-                cos_theta_cur_rank = torch.masked_select(
-                    output[0], one_hot).detach().cpu().numpy()
-                np.savez('{}/vis/epoch_{}_iter{}_rank_{}'.format(args.pth_save_fold, epoch, i, args.rank),
-                         x_norm_cur_rank, cos_theta_cur_rank)
 
 
 def debug_info(x_norm, l_a, u_a, l_margin, u_margin):
