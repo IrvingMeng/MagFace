@@ -30,12 +30,13 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 
 ## Model Zoo
 
-| Parallel Method | Float Type | Backbone | Dataset | Split FC? | Model | Log File |
+| Parallel Method | Loss | Backbone | Dataset | Split FC? | Model | Log File |
 | --- | --- | --- | --- | --- | --- | --- |
-| DDP | fp32 | iResNet100 | MS1MV2 | Yes | [GoogleDrive](https://drive.google.com/file/d/1Bd87admxOZvbIOAyTkGEntsEz3fyMt7H/view?usp=sharing), [BaiduDrive](https://pan.baidu.com/s/15iKz3wv6UhKmPGR6ltK4AA) code: wsw3 | **Trained by original codes** |
-| DP | fp32 | iResNet18 | CASIA-WebFace | No | [BaiduDrive](https://pan.baidu.com/s/1N478xTfSow342WsP9LTRXA) code: fkja | [BaiduDrive](https://pan.baidu.com/s/1JETcNuPYXfDlQuqq2GHM5w), code: npdc |
-| DP | fp32 | iResNet50 | MS1MV2 | No | [BaiduDrive](https://pan.baidu.com/s/1atuZZDkcCX3Bl14J8Ss_YQ) code: tvyv | [BaiduDrive](https://pan.baidu.com/s/1T6_TkEh9v9Vtf4Sw-chT2w), code: hpbt |
-| DDP | fp32 | iResNet50 | MS1MV2 | Yes | [BaiduDrive](https://pan.baidu.com/s/19FjwUyuPCTzLhGm3fvyPlw) code: idkx| [BaiduDrive](https://pan.baidu.com/s/1MGAmhtOangqr8nHxIFmNvg), code: 66j1 |
+| DDP | MagFace | iResNet100 | MS1MV2 | Yes | [GoogleDrive](https://drive.google.com/file/d/1Bd87admxOZvbIOAyTkGEntsEz3fyMt7H/view?usp=sharing), [BaiduDrive](https://pan.baidu.com/s/15iKz3wv6UhKmPGR6ltK4AA) code: wsw3 | **Trained by original codes** |
+| DDP | MagFace | iResNet50 | MS1MV2 | Yes | [BaiduDrive](https://pan.baidu.com/s/19FjwUyuPCTzLhGm3fvyPlw) code: idkx| [BaiduDrive](https://pan.baidu.com/s/1MGAmhtOangqr8nHxIFmNvg), code: 66j1 |
+| DP | MagFace | iResNet50 | MS1MV2 | No | [BaiduDrive](https://pan.baidu.com/s/1atuZZDkcCX3Bl14J8Ss_YQ) code: tvyv | [BaiduDrive](https://pan.baidu.com/s/1T6_TkEh9v9Vtf4Sw-chT2w), code: hpbt |
+| DP | MagFace | iResNet18 | CASIA-WebFace | No | [BaiduDrive](https://pan.baidu.com/s/1N478xTfSow342WsP9LTRXA) code: fkja | [BaiduDrive](https://pan.baidu.com/s/1JETcNuPYXfDlQuqq2GHM5w), code: npdc |
+| DP | ArcFace | iResNet18 | CASIA-WebFace | No | [BaiduDrive](https://pan.baidu.com/s/1M2M8u-GO6BnrxgYAOtXYEA) code: wq2w | [BaiduDrive](https://pan.baidu.com/s/1lp4wAlz85w2Y29DT8RqGfQ), code: 756e |
 
 
 ## Evaluation
