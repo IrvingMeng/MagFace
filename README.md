@@ -107,6 +107,8 @@ TODO list:
 - [ ] test fp16
 - [ ] extend the idea to CosFace
 
+**20210513**: add instructions for finetuning with MagFace
+
 **20210430**: Fix bugs for parallel training.
 
 **20210427**: [IMPORTANT] now parallel training is available (credits to Kaiyu Yue).
