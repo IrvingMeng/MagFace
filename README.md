@@ -12,7 +12,9 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 
 **Beamer**: [GoogleDrive](https://drive.google.com/file/d/1MPj_ghD7c1igA_fe20ooMbOcD-OsK0jC/view?usp=sharing), [BaiduDrive](https://pan.baidu.com/s/1wt9eqCbn6forcoAz1ZVrAw), code: c16b
 
-**Presentation**: TBD
+**Presentation**: 
+  1. CVPR [5-minute presentation](https://www.bilibili.com/video/BV1Jq4y1j7ZH).
+  2. Will record a long version later.
 
 **NOTE**: The original codes are implemented on a private codebase and will not be released. 
 **This repo is an official but abridged version.** See todo list for plans.
@@ -106,6 +108,8 @@ TODO list:
 - [x] add fp16
 - [ ] test fp16
 - [ ] extend the idea to CosFace
+
+**20210531**: add the 5-minutes presentation
 
 **20210513**: add instructions for finetuning with MagFace
 
