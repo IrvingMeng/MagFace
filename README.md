@@ -107,7 +107,10 @@ TODO list:
 - [ ] add evaluation codes for quality assessment
 - [x] add fp16
 - [ ] test fp16
-- [ ] extend the idea to CosFace
+- [x] extend the idea to CosFace, proved
+- [ ] implement Mag-CosFace
+
+**20210601**: Mag-CosFace is theoretically proved. Please check the updated arxiv paper.
 
 **20210531**: add the 5-minutes presentation
 
