@@ -14,7 +14,7 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 
 **Presentation**: 
   1. CVPR [5-minute presentation](https://www.bilibili.com/video/BV1Jq4y1j7ZH).
-  2. Will record a long version later.
+  2. Will release a detailed version before **Jun 12** (if everything goes well).
 
 **NOTE**: The original codes are implemented on a private codebase and will not be released. 
 **This repo is an official but abridged version.** See todo list for plans.
