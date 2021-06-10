@@ -44,6 +44,7 @@ parser.add_argument('--resume', default=None, type=str, metavar='PATH',
 parser.add_argument('-p', '--print-freq', default=100, type=int,
                     metavar='N', help='print frequency (default: 10)')
 parser.add_argument('--cpu-mode', action='store_true', help='Use the CPU.')
+parser.add_argument('--dist', default=1, help='use this if model is trained with dist')
 args = parser.parse_args()
 
 

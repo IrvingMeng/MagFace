@@ -14,7 +14,7 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 
 **Presentation**: 
   1. CVPR [5-minute presentation](https://www.bilibili.com/video/BV1Jq4y1j7ZH).
-  2. Will release a detailed version before **Jun 12** (if everything goes well).
+  2. Will release a detailed version later.
 
 **NOTE**: The original codes are implemented on a private codebase and will not be released. 
 **This repo is an official but abridged version.** See todo list for plans.
@@ -36,6 +36,7 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 | --- | --- | --- | --- | --- | --- | --- |
 | DDP | MagFace | iResNet100 | MS1MV2 | Yes | [GoogleDrive](https://drive.google.com/file/d/1Bd87admxOZvbIOAyTkGEntsEz3fyMt7H/view?usp=sharing), [BaiduDrive](https://pan.baidu.com/s/15iKz3wv6UhKmPGR6ltK4AA) code: wsw3 | **Trained by original codes** |
 | DDP | MagFace | iResNet50 | MS1MV2 | Yes | [BaiduDrive](https://pan.baidu.com/s/19FjwUyuPCTzLhGm3fvyPlw) code: idkx| [BaiduDrive](https://pan.baidu.com/s/1MGAmhtOangqr8nHxIFmNvg), code: 66j1 |
+| DDP | Mag-CosFace | iResNet50 | MS1MV2 | Yes | [BaiduDrive](https://pan.baidu.com/s/1wZOanpWKealVd-4cMAu_tQ) code: rg2w| [BaiduDrive](https://pan.baidu.com/s/10EQjRydQLJMAU98q7lH10w), code: ejec |
 | DP | MagFace | iResNet50 | MS1MV2 | No | [BaiduDrive](https://pan.baidu.com/s/1atuZZDkcCX3Bl14J8Ss_YQ) code: tvyv | [BaiduDrive](https://pan.baidu.com/s/1T6_TkEh9v9Vtf4Sw-chT2w), code: hpbt |
 | DP | MagFace | iResNet18 | CASIA-WebFace | No | [BaiduDrive](https://pan.baidu.com/s/1N478xTfSow342WsP9LTRXA) code: fkja | [BaiduDrive](https://pan.baidu.com/s/1JETcNuPYXfDlQuqq2GHM5w), code: npdc |
 | DP | ArcFace | iResNet18 | CASIA-WebFace | No | [BaiduDrive](https://pan.baidu.com/s/1M2M8u-GO6BnrxgYAOtXYEA) code: wq2w | [BaiduDrive](https://pan.baidu.com/s/1lp4wAlz85w2Y29DT8RqGfQ), code: 756e |
@@ -54,7 +55,7 @@ Steps to calculate face qualities ([examples.ipynb](inference/examples.ipynb) is
 2. Align images to 112x112 pixels with 5 facial landmarks ([code](https://github.com/deepinsight/insightface/blob/master/recognition/common/face_align.py)).
 3. Prepare a training list with format `imgname 0 id 0` in each line, as indicated [here](dataloader/dataloader.py#L31-L32). In the paper, we employ MS1MV2 as the training dataset which can be downloaded from [BaiduDrive](https://pan.baidu.com/s/1S6LJZGdqcZRle1vlcMzHOQ) or [Dropbox](https://www.dropbox.com/s/wpx6tqjf0y5mf6r/faces_ms1m-refine-v2_112x112.zip?dl=0).
 Use [`rec2image.py`](https://github.com/deepinsight/insightface/blob/master/recognition/common/rec2image.py) to extract images.
-4. Modify parameters in run/run.sh and run it!
+4. Modify parameters in `run.sh/run_dist.sh/run_dist_cos.sh` and run it.
 
 
 ## Parallel Training
@@ -108,7 +109,9 @@ TODO list:
 - [x] add fp16
 - [ ] test fp16
 - [x] extend the idea to CosFace, proved
-- [ ] implement Mag-CosFace
+- [x] implement Mag-CosFace
+
+**20210610**：[IMPORTANT] Mag-CosFace + ddp is implemented and tested!
 
 **20210601**: Mag-CosFace is theoretically proved. Please check the updated arxiv paper.
 

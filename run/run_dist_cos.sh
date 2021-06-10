@@ -4,13 +4,14 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
 la=10
 ua=110
-lm=0.45
+lm=0.35
 um=0.8
-lg=35
+lg=150
+ARC=0
 
 # settings
 MODEL_ARC=iresnet50
-OUTPUT=./test/
+OUTPUT=./test_cos_62/
 
 mkdir -p ${OUTPUT}/vis/
 
@@ -37,4 +38,5 @@ python -u trainer_dist.py \
     --l_margin ${lm} \
     --u_margin ${um} \
     --lambda_g ${lg} \
+    --arc ${ARC} \
     --vis_mag 1    2>&1 | tee ${OUTPUT}/output.log   

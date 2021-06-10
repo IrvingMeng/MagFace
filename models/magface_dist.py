@@ -71,7 +71,8 @@ class MagFaceBuilder(nn.Module):
                     args.embedding_size,
                     args.last_fc_size,
                     scale=args.arc_scale,
-                    local_rank_init=False,
+                    useArcFace=args.arc,
+                    local_rank_init=False                 
                 )
         )
 

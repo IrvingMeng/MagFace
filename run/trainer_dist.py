@@ -86,8 +86,8 @@ parser.add_argument('--u_margin', default=0.8, type=float,
                     help='the margin slop for m')
 parser.add_argument('--lambda_g', default=20, type=float,
                     help='the lambda for function g')
-parser.add_argument('--arc-scale', default=64, type=int,
-                    help='scale for arcmargin loss')
+parser.add_argument('--arc', default=1,type=int,
+                    help='1 means use Mag-ArcFace, 0 means Mag-CosFace' )
 parser.add_argument('--vis_mag', default=1, type=int,
                     help='visualize the magnitude against cos')
 
@@ -96,7 +96,9 @@ args = parser.parse_args()
 
 def main_worker(gpu, args):
     # check the feasible of the lambda g
-    s = 64
+    # args.arc_scale = 64 if args.arc else 30
+    args.arc_scale = 64
+    s = args.arc_scale
     k = (args.u_margin-args.l_margin)/(args.u_a-args.l_a)
     min_lambda = s*k*args.u_a**2*args.l_a**2/(args.u_a**2-args.l_a**2)
     color_lambda = 'red' if args.lambda_g < min_lambda else 'green'
@@ -159,7 +161,7 @@ def main_worker(gpu, args):
         state_dict = ts.collect_state_dict(model, state_dict)
     
         # save pth
-        if epoch % args.pth_save_epoch == 0:
+        if epoch % args.pth_save_epoch == 0 and args.rank == 0:
             utils.save_checkpoint({
                 'epoch': epoch + 1,
                 'arch': args.arch,
@@ -294,10 +296,9 @@ if __name__ == '__main__':
     args.amp_mode = True if args.fp16 else False    
     
     args.world_size = args.gpus * args.nodes                
-    os.environ['MASTER_ADDR'] = '172.20.10.63'              
+    os.environ['MASTER_ADDR'] = '172.20.10.62'              
     os.environ['NCCL_SOCKET_IFNAME'] = 'enp97s0f0' 
     os.environ['MASTER_PORT'] = '12355'                     
-    
     pprint.pprint(vars(args))
     if args.batch_size % args.world_size is not 0:
         print('batch size {} is not a multiplier of world size {}'.format(

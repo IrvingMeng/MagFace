@@ -21,13 +21,15 @@ class ParallelMagLinear(torch.nn.Module):
             inp_features,
             out_features,
             scale=64.0,
+            useArcFace=1,
             easy_margin=True,
-            local_rank_init=False
+            local_rank_init=False            
         ):
         super(ParallelMagLinear, self).__init__()
         self.inp_features = inp_features
         self.out_features = out_features
         self.scale = scale
+        self.useArcFace = useArcFace
 
         # weight
         self.weight = torch.Tensor(
@@ -36,7 +38,7 @@ class ParallelMagLinear(torch.nn.Module):
         ).to(ts.distributed.get_rank())
 
         # info
-        self.easy_margin = easy_margin
+        self.easy_margin = easy_margin        
         self.reset_parameters()
         self.slice_params()
 
@@ -59,34 +61,37 @@ class ParallelMagLinear(torch.nn.Module):
         x = ts.distributed.copy(x.float())
 
         ada_margin = m(x_norm)
-        cos_m = torch.cos(ada_margin)
-        sin_m = torch.sin(ada_margin)
-
         # norm the weight
         weight_norm = F.normalize(self.weight, dim=-1)
         cos_theta = torch.mm(
             F.normalize(x),
             weight_norm.t()
         )
-        cos_theta = cos_theta.clamp(-1, 1)
-        sin_theta = torch.sqrt(1.0 - torch.pow(cos_theta, 2))
 
-        cos_theta_m = cos_theta * cos_m - sin_theta * sin_m
+        if self.useArcFace:
+            cos_m = torch.cos(ada_margin)
+            sin_m = torch.sin(ada_margin)
+            cos_theta = cos_theta.clamp(-1, 1)
+            sin_theta = torch.sqrt(1.0 - torch.pow(cos_theta, 2))
 
-        if self.easy_margin:
-            cos_theta_m = torch.where(
-                cos_theta.float() > 0,
-                cos_theta_m.float(),
-                cos_theta.float()
-            )
+            cos_theta_m = cos_theta * cos_m - sin_theta * sin_m
+
+            if self.easy_margin:
+                cos_theta_m = torch.where(
+                    cos_theta.float() > 0,
+                    cos_theta_m.float(),
+                    cos_theta.float()
+                )
+            else:
+                mm = torch.sin(math.pi - ada_margin) * ada_margin
+                threshold = torch.cos(math.pi - ada_margin)
+                cos_theta_m = torch.where(
+                    cos_theta.float() > threshold,
+                    cos_theta_m.float(),
+                    cos_theta.float() - mm
+                )
         else:
-            mm = torch.sin(math.pi - ada_margin) * ada_margin
-            threshold = torch.cos(math.pi - ada_margin)
-            cos_theta_m = torch.where(
-                cos_theta.float() > threshold,
-                cos_theta_m.float(),
-                cos_theta.float() - mm
-            )
+            cos_theta_m = cos_theta - ada_margin
 
         # multiply the scale in advance
         cos_theta_m = self.scale * cos_theta_m
