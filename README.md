@@ -53,7 +53,7 @@ Steps to calculate face qualities ([examples.ipynb](inference/examples.ipynb) is
 ## Basic Training
 1. install [requirements](raw/requirements.txt).
 2. Align images to 112x112 pixels with 5 facial landmarks ([code](https://github.com/deepinsight/insightface/blob/master/recognition/common/face_align.py)).
-3. Prepare a training list with format `imgname 0 id 0` in each line, as indicated [here](dataloader/dataloader.py#L31-L32). In the paper, we employ MS1MV2 as the training dataset which can be downloaded from [BaiduDrive](https://pan.baidu.com/s/1S6LJZGdqcZRle1vlcMzHOQ) or [Dropbox](https://www.dropbox.com/s/wpx6tqjf0y5mf6r/faces_ms1m-refine-v2_112x112.zip?dl=0).
+3. Prepare a training list with format `imgname 0 id 0` in each line (`id` starts from 0), as indicated [here](dataloader/dataloader.py#L31-L32). In the paper, we employ MS1MV2 as the training dataset which can be downloaded from [BaiduDrive](https://pan.baidu.com/s/1S6LJZGdqcZRle1vlcMzHOQ) or [Dropbox](https://www.dropbox.com/s/wpx6tqjf0y5mf6r/faces_ms1m-refine-v2_112x112.zip?dl=0).
 Use [`rec2image.py`](https://github.com/deepinsight/insightface/blob/master/recognition/common/rec2image.py) to extract images.
 4. Modify parameters in `run.sh/run_dist.sh/run_dist_cos.sh` and run it.
 
