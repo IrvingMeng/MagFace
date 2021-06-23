@@ -49,6 +49,13 @@ Steps to calculate face qualities ([examples.ipynb](inference/examples.ipynb) is
 1. Extract features from faces with `inference/gen_feat.py`. 
 2. Calculate feature magnitudes with `np.linalg.norm()`. 
 
+### Face Recognition
+Steps to evaluate modes on lfw/cfp/agedb:
+
+1. download the [data](https://pan.baidu.com/s/1vmw_1kOnKIu10jm5xlAxAQ), code: z7hs
+2. `cd eval/eval_recognition/` and extract the data in the folder
+3. evaluate the model by with eval.sh (e.g., `./eval.sh magface_epoch_00025.pth official 100`)
+
 
 ## Basic Training
 1. install [requirements](raw/requirements.txt).
@@ -104,12 +111,14 @@ TODO list:
 - [x] migrate parallel training 
 - [x] release mpu (Kaiyu Yue, in April) **renamed to torchshard**
 - [x] test parallel training 
-- [ ] add evaluation codes for recognition
+- [x] add evaluation codes for recognition
 - [ ] add evaluation codes for quality assessment
 - [x] add fp16
 - [ ] test fp16
 - [x] extend the idea to CosFace, proved
 - [x] implement Mag-CosFace
+
+**20210723**: add evaluation code for recognition
 
 **20210610**：[IMPORTANT] Mag-CosFace + ddp is implemented and tested!
 

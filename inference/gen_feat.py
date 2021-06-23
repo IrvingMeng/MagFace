@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 sys.path.append("..")
+sys.path.append("../../")
 
 from utils import utils
 from network_inf import builder_inf
