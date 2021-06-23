@@ -1,6 +1,7 @@
 CKPT=$1
 FEAT_SUFFIX=$2
 NL=$3
+
 ARCH=iresnet${NL}
 FEAT_PATH=./features/magface_${ARCH}/
 mkdir -p ${FEAT_PATH}

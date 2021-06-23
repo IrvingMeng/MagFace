@@ -52,9 +52,11 @@ Steps to calculate face qualities ([examples.ipynb](inference/examples.ipynb) is
 ### Face Recognition
 Steps to evaluate modes on lfw/cfp/agedb:
 
-1. download the [data](https://pan.baidu.com/s/1vmw_1kOnKIu10jm5xlAxAQ), code: z7hs
+1. download data from [link](https://pan.baidu.com/s/1vmw_1kOnKIu10jm5xlAxAQ), code: z7hs
 2. `cd eval/eval_recognition/` and extract the data in the folder
-3. evaluate the model by with eval.sh (e.g., `./eval.sh magface_epoch_00025.pth official 100`)
+3. evaluate the model by with `eval.sh` (e.g., `./eval.sh magface_epoch_00025.pth official 100`)
+
+Use `eval_ijb.sh` for evaluation on [IJB-B](https://pan.baidu.com/s/1br4I7EAmNwHKkxofqY6w0A) (code: iiwa) and [IJB-C](https://pan.baidu.com/s/1BcPsBvzKOw0ONZlv_RuhpQ) (code: q6md). **Please apply for permissions first from [NIST](https://www.nist.gov/programs-projects/face-challenges) before your usage.**
 
 
 ## Basic Training
