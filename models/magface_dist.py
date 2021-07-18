@@ -18,6 +18,7 @@ import torchshard as ts
 
 def builder(args):
     model = MagFaceBuilder(args)
+    model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model).to(args.gpu)
     model.features = parallel.DistributedDataParallel(
                     model.features.to(args.gpu),
                     device_ids=[args.gpu],
