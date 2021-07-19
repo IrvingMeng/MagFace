@@ -94,6 +94,19 @@ parser.add_argument('--vis_mag', default=1, type=int,
 args = parser.parse_args()
 
 
+def init_seeds(seed=0, cuda_deterministic=False):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    # Speed-reproducibility tradeoff https://pytorch.org/docs/stable/notes/randomness.html
+    if cuda_deterministic:  # slower, more reproducible
+        cudnn.deterministic = True
+        cudnn.benchmark = False
+    else:  # faster, less reproducible
+        cudnn.deterministic = False
+        cudnn.benchmark = True
+
+
 def main_worker(gpu, args):
     # check the feasible of the lambda g
     # args.arc_scale = 64 if args.arc else 30
@@ -108,7 +121,8 @@ def main_worker(gpu, args):
     args.rank = args.nr * args.gpus + args.gpu
     torch.cuda.set_device(gpu)
     torch.distributed.init_process_group(backend='nccl', init_method='env://', world_size=args.world_size, rank=args.rank)
-    torch.manual_seed(0)
+    init_seeds(0+args.rank)  
+    
     # logs
     if args.rank == 0:
         cprint('min lambda g is {}, currrent lambda is {}'.format(
