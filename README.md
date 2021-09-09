@@ -43,11 +43,6 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 
 
 ## Evaluation
-### Quality Assessment
-Steps to calculate face qualities ([examples.ipynb](inference/examples.ipynb) is a toy example).
-
-1. Extract features from faces with `inference/gen_feat.py`. 
-2. Calculate feature magnitudes with `np.linalg.norm()`. 
 
 ### Face Recognition
 Steps to evaluate modes on lfw/cfp/agedb:
@@ -56,7 +51,20 @@ Steps to evaluate modes on lfw/cfp/agedb:
 2. `cd eval/eval_recognition/` and extract the data in the folder
 3. evaluate the model by with `eval.sh` (e.g., `./eval.sh magface_epoch_00025.pth official 100`)
 
-Use `eval_ijb.sh` for evaluation on [IJB-B](https://pan.baidu.com/s/1br4I7EAmNwHKkxofqY6w0A) (code: iiwa) and [IJB-C](https://pan.baidu.com/s/1BcPsBvzKOw0ONZlv_RuhpQ) (code: q6md). **Please apply for permissions first from [NIST](https://www.nist.gov/programs-projects/face-challenges) before your usage.**
+Use `eval_ijb.sh` for evaluation on [IJB-B](https://pan.baidu.com/s/1br4I7EAmNwHKkxofqY6w0A) (code: iiwa) and [IJB-C](https://pan.baidu.com/s/1BcPsBvzKOw0ONZlv_RuhpQ) (code: q6md). **Please apply for permissions from [NIST](https://www.nist.gov/programs-projects/face-challenges) before your usage.**
+
+### Quality Assessment
+Steps to calculate face qualities ([examples.ipynb](inference/examples.ipynb) is a toy example).
+
+1. extract features from faces with `inference/gen_feat.py`. 
+2. calculate feature magnitudes with `np.linalg.norm()`. 
+
+Plot the error-versus-reject curve: 
+
+1. prepare the features (in the recognition step).
+2. `cd eva/eval_quality` and run `eval_quality.sh` (e.g., `./eval_quality.sh  lfw`).
+
+Note: model used in the quality assessment session of the paper is not released. Contact me via [email](irvingmeng@outlook.com) if you need that model.
 
 
 ## Basic Training
@@ -114,11 +122,13 @@ TODO list:
 - [x] release mpu (Kaiyu Yue, in April) **renamed to torchshard**
 - [x] test parallel training 
 - [x] add evaluation codes for recognition
-- [ ] add evaluation codes for quality assessment
+- [x] add evaluation codes for quality assessment
 - [x] add fp16
 - [ ] test fp16
 - [x] extend the idea to CosFace, proved
 - [x] implement Mag-CosFace
+
+**20210909**: add evaluation code for quality assessments
 
 **20210723**: add evaluation code for recognition
 
