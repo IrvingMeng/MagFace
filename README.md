@@ -4,6 +4,8 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 
 ![magface](raw/magface.png)
 
+**Project Page**: https://irvingmeng.github.io/projects/magface/
+
 **Paper**: [arXiv](https://arxiv.org/abs/2103.06627)
 
 **A toy example**: [examples.ipynb](inference/examples.ipynb)
@@ -64,7 +66,7 @@ Plot the error-versus-reject curve:
 1. prepare the features (in the recognition step).
 2. `cd eva/eval_quality` and run `eval_quality.sh` (e.g., `./eval_quality.sh  lfw`).
 
-Note: model used in the quality assessment session of the paper is not released. Contact me via [email](irvingmeng@outlook.com) if you need that model.
+Note: model used in the quality assessment session of the paper can be found [here](https://drive.google.com/file/d/1vA1AVLblzdal_twXrLQhUKZ4ms9_hgqg/view?usp=sharing).
 
 
 ## Basic Training
