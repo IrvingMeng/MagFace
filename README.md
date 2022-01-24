@@ -49,7 +49,7 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 ### Face Recognition
 Steps to evaluate modes on lfw/cfp/agedb:
 
-1. download data from [link](https://pan.baidu.com/s/1vmw_1kOnKIu10jm5xlAxAQ), code: z7hs
+1. download data from [GDrive](https://drive.google.com/file/d/1HBGwyTFnl4Bt4hl5BpLE3t__J84R72TX/view?usp=sharing) or [BaiduDrive](https://pan.baidu.com/s/1vmw_1kOnKIu10jm5xlAxAQ), code: z7hs
 2. `cd eval/eval_recognition/` and extract the data in the folder
 3. evaluate the model by with `eval.sh` (e.g., `./eval.sh magface_epoch_00025.pth official 100`)
 
