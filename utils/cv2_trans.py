@@ -13,7 +13,7 @@ import collections
 import warnings
 
 import cv2
-from . import cv2_fucns as F
+from . import cv2_funcs as F
 
 __all__ = ["Compose", "ToTensor", "Normalize", "Lambda",
            "Resize", "CenterCrop", "RandomCrop",
