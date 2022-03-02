@@ -40,7 +40,7 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 | DDP | MagFace | iResNet50 | MS1MV2 | Yes | [BaiduDrive](https://pan.baidu.com/s/19FjwUyuPCTzLhGm3fvyPlw) code: idkx| [BaiduDrive](https://pan.baidu.com/s/1MGAmhtOangqr8nHxIFmNvg), code: 66j1 |
 | DDP | Mag-CosFace | iResNet50 | MS1MV2 | Yes | [BaiduDrive](https://pan.baidu.com/s/1wZOanpWKealVd-4cMAu_tQ) code: rg2w| [BaiduDrive](https://pan.baidu.com/s/10EQjRydQLJMAU98q7lH10w), code: ejec |
 | DP | MagFace | iResNet50 | MS1MV2 | No | [BaiduDrive](https://pan.baidu.com/s/1atuZZDkcCX3Bl14J8Ss_YQ) code: tvyv | [BaiduDrive](https://pan.baidu.com/s/1T6_TkEh9v9Vtf4Sw-chT2w), code: hpbt |
-| DP | MagFace | iResNet18 | CASIA-WebFace | No | [BaiduDrive](https://pan.baidu.com/s/1N478xTfSow342WsP9LTRXA) code: fkja | [BaiduDrive](https://pan.baidu.com/s/1JETcNuPYXfDlQuqq2GHM5w), code: npdc |
+| DP | MagFace | iResNet18 | CASIA-WebFace | No | [BaiduDrive](https://pan.baidu.com/s/1N478xTfSow342WsP9LTRXA) code: fkja | [BaiduDrive](https://pan.baidu.com/s/1bdfE7W2ffUB8ehDaOt-tBw), code: qv2x |
 | DP | ArcFace | iResNet18 | CASIA-WebFace | No | [BaiduDrive](https://pan.baidu.com/s/1M2M8u-GO6BnrxgYAOtXYEA) code: wq2w | [BaiduDrive](https://pan.baidu.com/s/1lp4wAlz85w2Y29DT8RqGfQ), code: 756e |
 
 
