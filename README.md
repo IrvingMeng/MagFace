@@ -8,6 +8,8 @@ in *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2021, **
 
 **Paper**: [arXiv](https://arxiv.org/abs/2103.06627)
 
+**知乎解读**: [https://zhuanlan.zhihu.com/p/475775106](https://zhuanlan.zhihu.com/p/475775106)
+
 **A toy example**: [examples.ipynb](inference/examples.ipynb)
 
 **Poster**: [GoogleDrive](https://drive.google.com/file/d/1S0hoQNDJC_H8b8ryuYyF7xjVLMorlBu1/view?usp=sharing), [BaiduDrive](https://pan.baidu.com/s/1Ji1fRtwfTzwm9egWGtarWQ) code: dt9e
