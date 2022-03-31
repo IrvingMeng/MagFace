@@ -75,7 +75,7 @@ Note: model used in the quality assessment session of the paper can be found [he
 1. install [requirements](raw/requirements.txt).
 2. Align images to 112x112 pixels with 5 facial landmarks ([code](https://github.com/deepinsight/insightface/blob/cdc3d4ed5de14712378f3d5a14249661e54a03ec/python-package/insightface/utils/face_align.py)).
 3. Prepare a training list with format `imgname 0 id 0` in each line (`id` starts from 0), as indicated [here](dataloader/dataloader.py#L31-L32). In the paper, we employ MS1MV2 as the training dataset which can be downloaded from InsightFace (MS1M-ArcFace in [DataZoo](https://github.com/deepinsight/insightface/tree/master/recognition/_datasets_)).
-Use [`rec2image.py`](https://github.com/deepinsight/insightface/blob/master/recognition/common/rec2image.py) to extract images.
+Use [`rec2image.py`](https://github.com/deepinsight/insightface/blob/0b5cab57b6011a587386bb14ac01ff2d74af1ff9/recognition/common/rec2image.py) to extract images.
 4. Modify parameters in `run.sh/run_dist.sh/run_dist_cos.sh` and run it.
 
 
