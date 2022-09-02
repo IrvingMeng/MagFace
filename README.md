@@ -55,7 +55,7 @@ Steps to evaluate modes on lfw/cfp/agedb:
 2. `cd eval/eval_recognition/` and extract the data in the folder
 3. evaluate the model by with `eval.sh` (e.g., `./eval.sh magface_epoch_00025.pth official 100`)
 
-Use `eval_ijb.sh` for evaluation on [IJB-B](https://pan.baidu.com/s/1br4I7EAmNwHKkxofqY6w0A) (code: iiwa) and [IJB-C](https://pan.baidu.com/s/1BcPsBvzKOw0ONZlv_RuhpQ) (code: q6md). **Please apply for permissions from [NIST](https://www.nist.gov/programs-projects/face-challenges) before your usage.**
+Use `eval_ijb.sh` for evaluation on IJB-B ([Gdrive](https://drive.google.com/file/d/1eR1xUXNf16wLQAH0It8YpfyUN5SvHgcz/view?usp=sharing) or[BaiduDrive](https://pan.baidu.com/s/1br4I7EAmNwHKkxofqY6w0A) code: iiwa) and IJB-C ([Gdrive](https://drive.google.com/file/d/10728RcLaX-LEYUHYtCLcIaCLGOYnajXy/view?usp=sharing) or [BaiduDrive](https://pan.baidu.com/s/1BcPsBvzKOw0ONZlv_RuhpQ) code: q6md). **Please apply for permissions from [NIST](https://www.nist.gov/programs-projects/face-challenges) before your usage.**
 
 ### Quality Assessment
 Steps to calculate face qualities ([examples.ipynb](inference/examples.ipynb) is a toy example).
