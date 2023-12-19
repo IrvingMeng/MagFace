@@ -107,9 +107,13 @@ Parallel training (Sec. 5.1 in [ArcFace](https://arxiv.org/pdf/1801.07698v3.pdf)
    - Generate features from a few samples by existing model and calculate their magnitudes.
    - Assume that magnitudes are distributed in `[x1, x2]`, then modify parameters to meet `l_a < x1, u_a > x2`.
    - In our scenario, we have a model trained by ArcFace which produces magnitudes around 1. `[l_a, u_a, l_m, u_m, l_g] =[1, 51, 0.45, 1, 5]` is a good choice.
+   - 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=IrvingMeng/MagFace&type=Date)](https://star-history.com/#IrvingMeng/MagFace&Date)
 
 
-## Third-party Re-implementation
+## Third-party Implementation
 
 - Pytorch: [FaceX-Zoo](https://github.com/JDAI-CV/FaceX-Zoo/tree/main/training_mode) from JDAI.
 - Pytorch: [pt-femb-face-embeddings](https://github.com/jonasgrebe/pt-femb-face-embeddings) from [Jonas Grebe](https://github.com/jonasgrebe)
